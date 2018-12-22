@@ -1,0 +1,66 @@
+package com.kingfisher.deployment.audit.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.kingfisher.deployment.audit.model.Deployment;
+import com.kingfisher.deployment.audit.service.DeploymentAuditService;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+
+@RestController
+@Api(value = "DeploymentAudit", description = "API to record and report on Deployments and compare application status across tiers")
+@RequestMapping("/deployment/audit")
+public class DeploymentAuditController {
+
+	@Autowired
+	DeploymentAuditService deploymentAuditService;
+
+	/**
+	 * Add a set of deployments audits
+	 * 
+	 * @param deployments
+	 *            Deployments that need adding to the audit
+	 */
+	@ApiOperation("Add a set of deployments audits")
+	@RequestMapping(value = "/", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+	public void audit(
+			@ApiParam(value = "Deployments that need adding to the audit", required = true) @RequestBody List<Deployment> deployments) {
+
+	}
+
+	/**
+	 * Generates an Excel Report with application status across environments
+	 * 
+	 * @param referenceEnv
+	 *            Generate an Excel Report with application status across
+	 *            environments
+	 * @param reportingEnv
+	 *            List of environments to extract info for and compared against
+	 *            reference environment
+	 * @return report in excel format
+	 */
+	@ApiOperation("Generates an Excel Report with application status across environments")
+	@RequestMapping(value = "/report", method = RequestMethod.POST, produces = "application/vnd.ms-excel")
+	public String auditReport(
+			@ApiParam(value = " Generate an Excel Report with application status across environments", required = true) @RequestParam("referenceEnv") String referenceEnv,
+			@ApiParam(value = "List of environments to extract info for and compared against reference environment", required = true) @RequestParam("reportingEnv") String reportingEnv) {
+
+		return null;
+	}
+
+	@RequestMapping(value="/test",consumes = "application/json", produces = "application/json")
+	public void test() throws Exception {
+		throw new Exception("this is exception");
+	}
+
+}
