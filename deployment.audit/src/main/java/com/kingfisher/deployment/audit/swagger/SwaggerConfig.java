@@ -16,11 +16,11 @@ public class SwaggerConfig {
 	public Docket productApi() {
 		return new Docket(DocumentationType.SWAGGER_2).select()
 				.apis(RequestHandlerSelectors.basePackage("com.kingfisher.deployment.audit.controller"))
-				/*.paths(regex("/Deployment.*"))*/.build().apiInfo(metaData());
+				/*.paths(regex("/User.*"))*/.build().apiInfo(metaData());
 	}
 
 	private ApiInfo metaData() {
-		ApiInfo apiInfo = new ApiInfo("Deployment Audit API", "Swagger Definition for the Inventory Application API",
+		ApiInfo apiInfo = new ApiInfo("User Audit API", "Swagger Definition for the Inventory Application API",
 				"1.0.0", "Terms of service", "", "Sumangal Mandal (sumangal.mandal@kingfisher.com)", "");
 		return apiInfo;
 	}

@@ -1,4 +1,4 @@
-package com.kingfisher.deployment.audit.model;
+package com.kingfisher.deployment.audit.data.model;
 
 import java.util.Date;
 

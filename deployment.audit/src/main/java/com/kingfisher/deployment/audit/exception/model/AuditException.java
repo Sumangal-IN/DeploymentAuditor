@@ -1,4 +1,4 @@
-package com.kingfisher.deployment.audit.exception;
+package com.kingfisher.deployment.audit.exception.model;
 
 public class AuditException {
 	private int code;
