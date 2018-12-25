@@ -19,7 +19,7 @@ public class ExcelReportBuilder {
 
 		Workbook workbook = new XSSFWorkbook();
 		Sheet sheet = workbook.createSheet(sheetName);
-		createMainHeader(sheet, referenceEnv, reportingEnv);
+		createHeader(sheet, referenceEnv, reportingEnv);
 		createSubHeader(sheet, reportingEnv);
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -45,7 +45,7 @@ public class ExcelReportBuilder {
 		}
 	}
 
-	private void createMainHeader(Sheet sheet, String referenceEnv, List<String> reportingEnv) {
+	private void createHeader(Sheet sheet, String referenceEnv, List<String> reportingEnv) {
 		Row row = sheet.createRow(1);
 		int cellnum = 4;
 		Cell cell = row.createCell(cellnum);
