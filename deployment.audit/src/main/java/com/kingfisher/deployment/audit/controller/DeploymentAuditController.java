@@ -53,20 +53,10 @@ public class DeploymentAuditController {
 	 */
 	@ApiOperation("Generates an Excel Report with application status across environments")
 	@RequestMapping(value = "/report", method = RequestMethod.GET, produces = "application/vnd.ms-excel")
-	public ResponseEntity<byte[]> auditReport(@ApiParam(value = " Generate an Excel Report with application status across environments", required = true) @RequestParam("referenceEnv") String referenceEnv, @ApiParam(value = "List of environments to extract info for and compared against reference environment", required = true) @RequestParam("reportingEnv") String reportingEnv) throws IOException {
+	public ResponseEntity<byte[]> auditReport(@ApiParam(value = " Generate an Excel Report with application status across environments", required = true) @RequestParam("referenceEnv") String referenceEnv, @ApiParam(value = "List of environments to extract info for and compared against reference environment", required = true) @RequestParam("reportingEnv") List<String> reportingEnv) throws IOException {
 		byte[] data = deploymentAuditService.createReport(referenceEnv, reportingEnv);
 		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + "report.xlsx").contentLength(data.length) //
 				.body(data);
-	}
-
-	@RequestMapping(value = "/test", method = RequestMethod.GET, produces = "application/json")
-	public void test() throws Exception {
-		throw new Exception("this is exception");
-	}
-
-	@RequestMapping(value = "/test2", method = RequestMethod.GET, produces = "application/json")
-	public void test2() throws Exception {
-		throw new NullPointerException("this is exception");
 	}
 
 }
