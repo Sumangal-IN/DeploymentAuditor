@@ -1,4 +1,11 @@
 delete from deployment;
+/*ArticleHierarchy_notify-RS*/
+insert into deployment
+(deployment_id,application_name,environment,instance_name,integration_server,bar_release_id,created_time) values
+(20,'ArticleHierarchy_notify-RS','P','*','MDAT','F2522.12.12',sysdate),
+(21,'ArticleHierarchy_notify-RS','F','*','MDAT','F2522.12.12',sysdate+1),
+(22,'ArticleHierarchy_notify-RS','V','*','MDAT','F2522.12.12',sysdate+2),
+(23,'ArticleHierarchy_notify-RS','Q','*','MDAT','F2522.12.12',sysdate+3);
 /*Product_Gateway_V2*/
 insert into deployment
 (deployment_id,application_name,environment,instance_name,integration_server,bar_release_id,created_time) values

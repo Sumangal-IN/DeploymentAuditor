@@ -19,4 +19,9 @@ public interface DeploymentRepository extends JpaRepository<Deployment, Integer>
 			  		"(r.application_name=d.application_name and r.max_created_time=d.created_time and r.instance_name=d.instance_name)", 
 			  nativeQuery = true)
 	List<Deployment> getLatestStatByEnvironment(@Param("env") String env);
+	
+	@Query(value="select distinct applciation_name from deployment where environment=:env", nativeQuery=true)
+	List<String> getDistinctApplicationNameByEnvironment(@Param("env") String env);
+	
+	List<Deployment> getLatestDeploymentByApplicationNameAndEnvironment(@Param("env") String env,@Param("app") String app);
 }
