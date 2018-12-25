@@ -13,10 +13,10 @@ import com.kingfisher.deployment.audit.data.model.Deployment;
 public interface DeploymentRepository extends JpaRepository<Deployment, Integer> {
 	
 	@Query(
-			  value = "select d.* from (SELECT application_name, max(created_time) as max_created_time FROM DEPLOYMENT where environment=:env group by application_name) r " + 
+			  value = "select d.* from (SELECT application_name, instance_name, max(created_time) as max_created_time FROM DEPLOYMENT where environment=:env group by application_name,instance_name) r " + 
 			  		"join " + 
 			  		"(select * from DEPLOYMENT where environment=:env) d on " + 
-			  		"(r.application_name=d.application_name and r.max_created_time=d.created_time)", 
+			  		"(r.application_name=d.application_name and r.max_created_time=d.created_time and r.instance_name=d.instance_name)", 
 			  nativeQuery = true)
 	List<Deployment> getLatestStatByEnvironment(@Param("env") String env);
 }
