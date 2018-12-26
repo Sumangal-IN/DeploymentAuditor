@@ -22,7 +22,7 @@ import io.swagger.annotations.ApiParam;
 
 @RestController
 @Api(value = "DeploymentAudit")
-@RequestMapping("/deployment/audit")
+@RequestMapping("/deployment")
 public class DeploymentAuditController {
 
 	@Autowired
@@ -35,7 +35,7 @@ public class DeploymentAuditController {
 	 *            Deployments that need adding to the audit
 	 */
 	@ApiOperation("Add a set of deployments audits")
-	@PostMapping(value = "/", consumes = "application/json", produces = "application/json")
+	@PostMapping(value = "/audit", consumes = "application/json", produces = "application/json")
 	public void audit(@ApiParam(value = "Deployments that need adding to the audit", required = true) @RequestBody List<Deployment> deployments) {
 		deploymentAuditService.recordDeployments(deployments);
 	}
@@ -54,7 +54,7 @@ public class DeploymentAuditController {
 	 */
 	@ApiOperation("Generates an Excel Report with application status across environments")
 	@GetMapping(value = "/report", produces = "application/vnd.ms-excel")
-	public ResponseEntity<byte[]> auditReport(@ApiParam(value = " Generate an Excel Report with application status across environments", required = true) @RequestParam("referenceEnv") String referenceEnv, @ApiParam(value = "List of environments to extract info for and compared against reference environment", required = true) @RequestParam("reportingEnv") List<String> reportingEnv) throws IOException {
+	public ResponseEntity<byte[]> report(@ApiParam(value = " Generate an Excel Report with application status across environments", required = true) @RequestParam("referenceEnv") String referenceEnv, @ApiParam(value = "List of environments to extract info for and compared against reference environment", required = true) @RequestParam("reportingEnv") List<String> reportingEnv) throws IOException {
 		byte[] data = deploymentAuditService.createReport(referenceEnv, reportingEnv);
 		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + deploymentAuditService.getReportFileName()).contentLength(data.length) //
 				.body(data);

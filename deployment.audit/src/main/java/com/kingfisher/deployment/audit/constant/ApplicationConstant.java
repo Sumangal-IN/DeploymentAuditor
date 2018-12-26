@@ -11,8 +11,9 @@ public class ApplicationConstant {
 	/**
 	 * Constants
 	 */
-	public static final String ROLE_ADMIN = "ROLE_ADMIN";
-	public static final String ROLE_USER = "ROLE_ADMIN";
+	public static final String ROLE_ADMIN = "ADMIN";
+	public static final String ROLE_USER = "USER";
+	public static final String ROLE_JENKINS = "JENKINS";
 
 	public static final String FONT_CALIBRI = "Calibri";
 	public static final String FONT_WINGDINGS = "Wingdings";
