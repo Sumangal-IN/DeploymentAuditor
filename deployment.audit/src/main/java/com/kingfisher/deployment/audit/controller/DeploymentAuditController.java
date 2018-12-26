@@ -6,9 +6,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,7 +21,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
 @RestController
-@Api(value = "DeploymentAudit", description = "API to record and report on Deployments and compare application status across tiers")
+@Api(value = "DeploymentAudit")
 @RequestMapping("/deployment/audit")
 public class DeploymentAuditController {
 
@@ -34,9 +35,9 @@ public class DeploymentAuditController {
 	 *            Deployments that need adding to the audit
 	 */
 	@ApiOperation("Add a set of deployments audits")
-	@RequestMapping(value = "/", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+	@PostMapping(value = "/", consumes = "application/json", produces = "application/json")
 	public void audit(@ApiParam(value = "Deployments that need adding to the audit", required = true) @RequestBody List<Deployment> deployments) {
-
+		deploymentAuditService.recordDeployments(deployments);
 	}
 
 	/**
@@ -52,10 +53,10 @@ public class DeploymentAuditController {
 	 * @throws IOException
 	 */
 	@ApiOperation("Generates an Excel Report with application status across environments")
-	@RequestMapping(value = "/report", method = RequestMethod.GET, produces = "application/vnd.ms-excel")
+	@GetMapping(value = "/report", produces = "application/vnd.ms-excel")
 	public ResponseEntity<byte[]> auditReport(@ApiParam(value = " Generate an Excel Report with application status across environments", required = true) @RequestParam("referenceEnv") String referenceEnv, @ApiParam(value = "List of environments to extract info for and compared against reference environment", required = true) @RequestParam("reportingEnv") List<String> reportingEnv) throws IOException {
 		byte[] data = deploymentAuditService.createReport(referenceEnv, reportingEnv);
-		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + "report.xlsx").contentLength(data.length) //
+		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + deploymentAuditService.getReportFileName()).contentLength(data.length) //
 				.body(data);
 	}
 

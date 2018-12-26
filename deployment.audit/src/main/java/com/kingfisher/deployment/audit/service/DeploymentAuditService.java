@@ -1,10 +1,12 @@
 package com.kingfisher.deployment.audit.service;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,25 +24,32 @@ public class DeploymentAuditService {
 	@Autowired
 	ExcelReportBuilder excelReportBuilder;
 
-	public byte[] createReport(String referenceEnv, List<String> reportingEnv) throws IOException {
-		Map<String, String[]> reportDataReferenceEnv = prepareDataForReport(deploymentRepository.getLatestStatByEnvironment(referenceEnv));
-		List<Map<String, String[]>> reportDataReportingEnv = new ArrayList<>();
-		for (String env : reportingEnv)
-			reportDataReportingEnv.add(prepareDataForReport(deploymentRepository.getLatestStatByEnvironment(env)));
-		return excelReportBuilder.createReportWithEnvData(referenceEnv,reportDataReferenceEnv, reportingEnv,reportDataReportingEnv, "report_sheet");
+	public byte[] createReport(String referenceEnv, List<String> reportingEnvs) throws IOException {
+		List<String> applications = deploymentRepository.findApplicationNameByEnvironment(referenceEnv);
+
+		Map<String, Map<String, List<Deployment>>> reportData = new TreeMap<>();
+		for (String application : applications)
+			reportData.put(application, prepareDataForApplication(application, referenceEnv, reportingEnvs));
+
+		return excelReportBuilder.createReport(referenceEnv, reportingEnvs, reportData, "report");
 	}
 
-	private Map<String, String[]> prepareDataForReport(List<Deployment> referenceEnvStatus) {
-		Map<String, String[]> reportDataByApplicationName = new HashMap<>();
-		for (Deployment envStatus : referenceEnvStatus) {
-			String[] param = new String[4];
-			param[0] = envStatus.getEnvironment();
-			param[1] = envStatus.getInstanceName();
-			param[2] = envStatus.getIntegrationServer();
-			param[3] = envStatus.getBarReleaseId();
-			reportDataByApplicationName.put(envStatus.getApplicationName(), param);
+	private Map<String, List<Deployment>> prepareDataForApplication(String application, String referenceEnv, List<String> reportingEnvs) {
+		Map<String, List<Deployment>> latestDeploymentsInEnvironmentForApplication = new HashMap<>();
+		latestDeploymentsInEnvironmentForApplication.put(referenceEnv, deploymentRepository.findLatestDeploymentByApplicationNameAndEnvironment(referenceEnv, application));
+		for (String reportingEnv : reportingEnvs)
+			latestDeploymentsInEnvironmentForApplication.put(reportingEnv, deploymentRepository.findLatestDeploymentByApplicationNameAndEnvironment(reportingEnv, application));
+		return latestDeploymentsInEnvironmentForApplication;
+	}
+
+	public void recordDeployments(List<Deployment> deployments) {
+		for (Deployment deployment : deployments) {
+			deploymentRepository.save(deployment);
 		}
-		return reportDataByApplicationName;
+	}
+
+	public String getReportFileName() {
+		return "report_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(new Date())+".xlsx";
 	}
 
 }

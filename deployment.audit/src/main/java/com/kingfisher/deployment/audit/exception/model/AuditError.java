@@ -1,15 +1,15 @@
 package com.kingfisher.deployment.audit.exception.model;
 
-public class AuditException {
+public class AuditError {
 	private int code;
 	private String type;
 	private String message;
 
-	public AuditException() {
+	public AuditError() {
 		super();
 	}
 
-	public AuditException(int code, String type, String message) {
+	public AuditError(int code, String type, String message) {
 		super();
 		this.code = code;
 		this.type = type;

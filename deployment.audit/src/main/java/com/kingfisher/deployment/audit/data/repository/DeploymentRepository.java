@@ -11,17 +11,10 @@ import com.kingfisher.deployment.audit.data.model.Deployment;
 
 @Repository
 public interface DeploymentRepository extends JpaRepository<Deployment, Integer> {
-	
-	@Query(
-			  value = "select d.* from (SELECT application_name, instance_name, max(created_time) as max_created_time FROM DEPLOYMENT where environment=:env group by application_name,instance_name) r " + 
-			  		"join " + 
-			  		"(select * from DEPLOYMENT where environment=:env) d on " + 
-			  		"(r.application_name=d.application_name and r.max_created_time=d.created_time and r.instance_name=d.instance_name)", 
-			  nativeQuery = true)
-	List<Deployment> getLatestStatByEnvironment(@Param("env") String env);
-	
-	@Query(value="select distinct applciation_name from deployment where environment=:env", nativeQuery=true)
-	List<String> getDistinctApplicationNameByEnvironment(@Param("env") String env);
-	
-	List<Deployment> getLatestDeploymentByApplicationNameAndEnvironment(@Param("env") String env,@Param("app") String app);
+
+	@Query(value = "select distinct application_name from deployment where environment=:env order by application_name asc", nativeQuery = true)
+	List<String> findApplicationNameByEnvironment(@Param("env") String env);
+
+	@Query(value = "select d.* from (select max(created_time)max_created_time, instance_name ,integration_server from deployment where application_name=:app and environment=:env group by instance_name ,integration_server) p join (select * from deployment where application_name=:app and environment=:env) d on p.max_created_time=d.created_time and p.instance_name=d.instance_name and p.integration_server=d.integration_server", nativeQuery = true)
+	List<Deployment> findLatestDeploymentByApplicationNameAndEnvironment(@Param("env") String env, @Param("app") String app);
 }

@@ -9,53 +9,116 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
+
+import com.kingfisher.deployment.audit.data.model.Deployment;
 
 @Component
 public class ExcelReportBuilder {
 
-	public byte[] createReportWithEnvData(String referenceEnv, Map<String, String[]> reportDataReferenceEnv, List<String> reportingEnv, List<Map<String, String[]>> reportDataReportingEnv, String sheetName) throws IOException {
-
+	public byte[] createReport(String referenceEnv, List<String> reportingEnv, Map<String, Map<String, List<Deployment>>> reportData, String sheetName) throws IOException {
 		Workbook workbook = new XSSFWorkbook();
+		ExcelReportStyleBuilder.addStyles(workbook);
 		Sheet sheet = workbook.createSheet(sheetName);
-		createHeader(sheet, referenceEnv, reportingEnv);
-		createSubHeader(sheet, reportingEnv);
 
+		int currentRow = 1;
+		currentRow = createHeader(currentRow, sheet, referenceEnv, reportingEnv);
+		currentRow = createSubHeader(currentRow, sheet, reportingEnv);
+		createBody(currentRow, sheet, referenceEnv, reportData);
+
+		for (int col = 0; col < 7 + (3 * reportingEnv.size()); col++)
+			sheet.autoSizeColumn(col);
+
+		return workbookToBye(workbook);
+	}
+
+	private void createBody(int currentRow, Sheet sheet, String referenceEnv, Map<String, Map<String, List<Deployment>>> reportData) {
+		for (Map.Entry<String, Map<String, List<Deployment>>> rowDataPerApplication : reportData.entrySet()) {
+			String application = rowDataPerApplication.getKey();
+			Map<String, List<Deployment>> latestDeploymentsPerInstance = rowDataPerApplication.getValue();
+
+			int rowsRequiredForApplication = 1;
+			for (Map.Entry<String, List<Deployment>> rowDataPerApplicationPerInstance : latestDeploymentsPerInstance.entrySet())
+				if (rowsRequiredForApplication < rowDataPerApplicationPerInstance.getValue().size())
+					rowsRequiredForApplication = rowDataPerApplicationPerInstance.getValue().size();
+
+			for (int i = 0; i < rowsRequiredForApplication; i++) {
+				Row row = ExcelReportStyleBuilder.formatRow(sheet.createRow(currentRow), "body");
+				int cellnum = 0;
+				Cell cell = row.createCell(++cellnum);
+				if (i == 0)
+					ExcelReportStyleBuilder.setValueWithFormatting(cell, application, ExcelReportStyleBuilder.bodyStyle);
+				else
+					ExcelReportStyleBuilder.setValueWithFormatting(cell, "", ExcelReportStyleBuilder.bodyStyle);
+
+				cell = row.createCell(++cellnum);
+				ExcelReportStyleBuilder.setValueWithFormatting(cell, "ü", ExcelReportStyleBuilder.bodyStyleSpecialCharacterGreen);
+
+				for (Map.Entry<String, List<Deployment>> rowDataPerApplicationPerInstance : latestDeploymentsPerInstance.entrySet()) {
+					if (i < rowDataPerApplicationPerInstance.getValue().size()) {
+						Deployment deployment = rowDataPerApplicationPerInstance.getValue().get(i);
+						cell = row.createCell(++cellnum);
+						ExcelReportStyleBuilder.setValueWithFormatting(cell, deployment.getInstanceName(), ExcelReportStyleBuilder.bodyStyle);
+						cell = row.createCell(++cellnum);
+						ExcelReportStyleBuilder.setValueWithFormatting(cell, deployment.getIntegrationServer(), ExcelReportStyleBuilder.bodyStyle);
+						cell = row.createCell(++cellnum);
+						ExcelReportStyleBuilder.setValueWithFormatting(cell, deployment.getBarReleaseId(), ExcelReportStyleBuilder.bodyStyle);
+					} else {
+						cell = row.createCell(++cellnum);
+						ExcelReportStyleBuilder.setValueWithFormatting(cell, "", ExcelReportStyleBuilder.bodyStyle);
+						cell = row.createCell(++cellnum);
+						ExcelReportStyleBuilder.setValueWithFormatting(cell, "", ExcelReportStyleBuilder.bodyStyle);
+						cell = row.createCell(++cellnum);
+						ExcelReportStyleBuilder.setValueWithFormatting(cell, "", ExcelReportStyleBuilder.bodyStyle);
+					}
+				}
+				currentRow++;
+			}
+		}
+
+	}
+
+	private int createHeader(int currentRow, Sheet sheet, String referenceEnv, List<String> reportingEnv) {
+		Row row = ExcelReportStyleBuilder.formatRow(sheet.createRow(currentRow), "header");
+		int cellnum = 3;
+		Cell cell = row.createCell(cellnum);
+		ExcelReportStyleBuilder.setValueWithFormatting(cell, referenceEnv, ExcelReportStyleBuilder.headerStyle);
+		sheet.addMergedRegion(new CellRangeAddress(currentRow, currentRow, cellnum, cellnum + 2));
+		cellnum += 3;
+		for (String env : reportingEnv) {
+			cell = row.createCell(cellnum);
+			ExcelReportStyleBuilder.setValueWithFormatting(cell, env, ExcelReportStyleBuilder.headerStyle);
+			sheet.addMergedRegion(new CellRangeAddress(currentRow, currentRow, cellnum, cellnum + 2));
+			cellnum += 3;
+		}
+		return ++currentRow;
+	}
+
+	private int createSubHeader(int currentRow, Sheet sheet, List<String> reportingEnv) {
+		Row row = ExcelReportStyleBuilder.formatRow(sheet.createRow(currentRow), "subHeader");
+		int cellnum = 1;
+		Cell cell = row.createCell(cellnum++);
+		ExcelReportStyleBuilder.setValueWithFormatting(cell, "Application Name", ExcelReportStyleBuilder.subHeaderStyle);
+		cell = row.createCell(cellnum++);
+		ExcelReportStyleBuilder.setValueWithFormatting(cell, "Status", ExcelReportStyleBuilder.subHeaderStyle);
+		for (int i = 0; i <= reportingEnv.size(); i++) {
+			cell = row.createCell(cellnum++);
+			ExcelReportStyleBuilder.setValueWithFormatting(cell, "Instance", ExcelReportStyleBuilder.subHeaderStyle);
+			cell = row.createCell(cellnum++);
+			ExcelReportStyleBuilder.setValueWithFormatting(cell, "EG", ExcelReportStyleBuilder.subHeaderStyle);
+			cell = row.createCell(cellnum++);
+			ExcelReportStyleBuilder.setValueWithFormatting(cell, "Version", ExcelReportStyleBuilder.subHeaderStyle);
+		}
+		return ++currentRow;
+	}
+
+	private byte[] workbookToBye(Workbook workbook) throws IOException {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		workbook.write(bos);
 		workbook.close();
 		bos.close();
 		return bos.toByteArray();
-	}
-
-	private void createSubHeader(Sheet sheet, List<String> reportingEnv) {
-		Row row = sheet.createRow(2);
-		int cellnum = 2;
-		Cell cell = row.createCell(cellnum++);
-		cell.setCellValue("Application Name");
-		cell = row.createCell(cellnum++);
-		for (int i = 0; i <= reportingEnv.size(); i++) {
-			cell = row.createCell(cellnum++);
-			cell.setCellValue("Instance");
-			cell = row.createCell(cellnum++);
-			cell.setCellValue("EG");
-			cell = row.createCell(cellnum++);
-			cell.setCellValue("Version");
-		}
-	}
-
-	private void createHeader(Sheet sheet, String referenceEnv, List<String> reportingEnv) {
-		Row row = sheet.createRow(1);
-		int cellnum = 4;
-		Cell cell = row.createCell(cellnum);
-		cell.setCellValue(referenceEnv);
-		cellnum += 3;
-		for (String env : reportingEnv) {
-			cell = row.createCell(cellnum);
-			cell.setCellValue(env);
-			cellnum += 3;
-		}
-
 	}
 }

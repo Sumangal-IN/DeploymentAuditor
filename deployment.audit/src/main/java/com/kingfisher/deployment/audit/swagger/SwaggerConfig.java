@@ -19,7 +19,6 @@ public class SwaggerConfig {
 	}
 
 	private ApiInfo metaData() {
-		ApiInfo apiInfo = new ApiInfo("Deployment Audit API", "Swagger Definition for the Inventory Application API", "1.0.0", "", new Contact("Sumangal Mandal", "http://kingfisher.com", "sumangal.mandal@kingfisher.com"), "", "", new ArrayList<>());
-		return apiInfo;
+		return new ApiInfo("Deployment Audit API", "Swagger Definition for the Inventory Application API", "1.0.0", "", new Contact("Sumangal Mandal", "http://kingfisher.com", "sumangal.mandal@kingfisher.com"), "", "", new ArrayList<>());
 	}
 }
