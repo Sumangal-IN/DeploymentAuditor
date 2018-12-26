@@ -62,7 +62,7 @@ public class ExcelReportStyleBuilder {
 
 		font = workbook.createFont();
 		font.setFontHeightInPoints((short) 14);
-		font.setFontName(ApplicationConstant.FONT_Wingdings);
+		font.setFontName(ApplicationConstant.FONT_WINGDINGS);
 		font.setColor(IndexedColors.GREEN.getIndex());
 
 		bodyStyleSpecialCharacterGreen = setBorders(workbook.createCellStyle());
@@ -72,7 +72,7 @@ public class ExcelReportStyleBuilder {
 
 		font = workbook.createFont();
 		font.setFontHeightInPoints((short) 14);
-		font.setFontName(ApplicationConstant.FONT_Wingdings);
+		font.setFontName(ApplicationConstant.FONT_WINGDINGS);
 		font.setColor(IndexedColors.RED.getIndex());
 
 		bodyStyleSpecialCharacterRed = setBorders(workbook.createCellStyle());

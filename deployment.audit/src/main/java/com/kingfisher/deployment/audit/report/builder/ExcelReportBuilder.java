@@ -13,6 +13,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 
+import com.kingfisher.deployment.audit.constant.ApplicationConstant;
 import com.kingfisher.deployment.audit.data.model.Deployment;
 
 @Component
@@ -43,28 +44,51 @@ public class ExcelReportBuilder {
 			for (Map.Entry<String, List<Deployment>> rowDataPerApplicationPerInstance : latestDeploymentsPerInstance.entrySet())
 				if (rowsRequiredForApplication < rowDataPerApplicationPerInstance.getValue().size())
 					rowsRequiredForApplication = rowDataPerApplicationPerInstance.getValue().size();
-
+			int applicationMainRow = 0;
 			for (int i = 0; i < rowsRequiredForApplication; i++) {
 				Row row = ExcelReportStyleBuilder.formatRow(sheet.createRow(currentRow), "body");
+				if (i == 0)
+					applicationMainRow = currentRow;
+				boolean anomalyInApplication = false;
 				int cellnum = 0;
+				/* application name at column 1*/
 				Cell cell = row.createCell(++cellnum);
 				if (i == 0)
 					ExcelReportStyleBuilder.setValueWithFormatting(cell, application, ExcelReportStyleBuilder.bodyStyle);
 				else
 					ExcelReportStyleBuilder.setValueWithFormatting(cell, "", ExcelReportStyleBuilder.bodyStyle);
-
+				
+				/* application status at column 2*/
 				cell = row.createCell(++cellnum);
-				ExcelReportStyleBuilder.setValueWithFormatting(cell, "ü", ExcelReportStyleBuilder.bodyStyleSpecialCharacterGreen);
+				ExcelReportStyleBuilder.setValueWithFormatting(cell, "", ExcelReportStyleBuilder.bodyStyle);
 
 				for (Map.Entry<String, List<Deployment>> rowDataPerApplicationPerInstance : latestDeploymentsPerInstance.entrySet()) {
 					if (i < rowDataPerApplicationPerInstance.getValue().size()) {
 						Deployment deployment = rowDataPerApplicationPerInstance.getValue().get(i);
 						cell = row.createCell(++cellnum);
 						ExcelReportStyleBuilder.setValueWithFormatting(cell, deployment.getInstanceName(), ExcelReportStyleBuilder.bodyStyle);
-						cell = row.createCell(++cellnum);
-						ExcelReportStyleBuilder.setValueWithFormatting(cell, deployment.getIntegrationServer(), ExcelReportStyleBuilder.bodyStyle);
-						cell = row.createCell(++cellnum);
-						ExcelReportStyleBuilder.setValueWithFormatting(cell, deployment.getBarReleaseId(), ExcelReportStyleBuilder.bodyStyle);
+						if (rowDataPerApplicationPerInstance.getKey().equals(referenceEnv)) {
+							cell = row.createCell(++cellnum);
+							ExcelReportStyleBuilder.setValueWithFormatting(cell, deployment.getIntegrationServer(), ExcelReportStyleBuilder.bodyStyle);
+							cell = row.createCell(++cellnum);
+							ExcelReportStyleBuilder.setValueWithFormatting(cell, deployment.getBarReleaseId(), ExcelReportStyleBuilder.bodyStyle);
+						} else {
+							cell = row.createCell(++cellnum);
+							if (isEGMatch(deployment, latestDeploymentsPerInstance.get(referenceEnv))) {
+								ExcelReportStyleBuilder.setValueWithFormatting(cell, deployment.getIntegrationServer(), ExcelReportStyleBuilder.bodyStyle);
+							} else {
+								anomalyInApplication = true;
+								ExcelReportStyleBuilder.setValueWithFormatting(cell, deployment.getIntegrationServer(), ExcelReportStyleBuilder.bodyStyleAlert);
+							}
+
+							cell = row.createCell(++cellnum);
+							if (isVersionMatch(deployment, latestDeploymentsPerInstance.get(referenceEnv))) {
+								ExcelReportStyleBuilder.setValueWithFormatting(cell, deployment.getBarReleaseId(), ExcelReportStyleBuilder.bodyStyle);
+							} else {
+								anomalyInApplication = true;
+								ExcelReportStyleBuilder.setValueWithFormatting(cell, deployment.getBarReleaseId(), ExcelReportStyleBuilder.bodyStyleAlert);
+							}
+						}
 					} else {
 						cell = row.createCell(++cellnum);
 						ExcelReportStyleBuilder.setValueWithFormatting(cell, "", ExcelReportStyleBuilder.bodyStyle);
@@ -74,10 +98,32 @@ public class ExcelReportBuilder {
 						ExcelReportStyleBuilder.setValueWithFormatting(cell, "", ExcelReportStyleBuilder.bodyStyle);
 					}
 				}
+
+				/* update application status at column 2*/
+				cell = sheet.getRow(applicationMainRow).getCell(2);
+				if (anomalyInApplication)
+					ExcelReportStyleBuilder.setValueWithFormatting(cell, "û", ExcelReportStyleBuilder.bodyStyleSpecialCharacterRed);
+				else
+					ExcelReportStyleBuilder.setValueWithFormatting(cell, "ü", ExcelReportStyleBuilder.bodyStyleSpecialCharacterGreen);
+
 				currentRow++;
 			}
-		}
 
+		}
+	}
+
+	private boolean isVersionMatch(Deployment deployment, List<Deployment> referenceEnvDeployments) {
+		for (Deployment referenceEnvDeployment : referenceEnvDeployments)
+			if (referenceEnvDeployment.getBarReleaseId().equals(deployment.getBarReleaseId()))
+				return true;
+		return false;
+	}
+
+	private boolean isEGMatch(Deployment deployment, List<Deployment> referenceEnvDeployments) {
+		for (Deployment referenceEnvDeployment : referenceEnvDeployments)
+			if (referenceEnvDeployment.getIntegrationServer().equals(deployment.getIntegrationServer()))
+				return true;
+		return false;
 	}
 
 	private int createHeader(int currentRow, Sheet sheet, String referenceEnv, List<String> reportingEnv) {
@@ -100,16 +146,16 @@ public class ExcelReportBuilder {
 		Row row = ExcelReportStyleBuilder.formatRow(sheet.createRow(currentRow), "subHeader");
 		int cellnum = 1;
 		Cell cell = row.createCell(cellnum++);
-		ExcelReportStyleBuilder.setValueWithFormatting(cell, "Application Name", ExcelReportStyleBuilder.subHeaderStyle);
+		ExcelReportStyleBuilder.setValueWithFormatting(cell, ApplicationConstant.REPORT_STRING_APPLICATION_NAME, ExcelReportStyleBuilder.subHeaderStyle);
 		cell = row.createCell(cellnum++);
-		ExcelReportStyleBuilder.setValueWithFormatting(cell, "Status", ExcelReportStyleBuilder.subHeaderStyle);
+		ExcelReportStyleBuilder.setValueWithFormatting(cell, ApplicationConstant.REPORT_STRING_STATUS, ExcelReportStyleBuilder.subHeaderStyle);
 		for (int i = 0; i <= reportingEnv.size(); i++) {
 			cell = row.createCell(cellnum++);
-			ExcelReportStyleBuilder.setValueWithFormatting(cell, "Instance", ExcelReportStyleBuilder.subHeaderStyle);
+			ExcelReportStyleBuilder.setValueWithFormatting(cell, ApplicationConstant.REPORT_STRING_INSTANCE, ExcelReportStyleBuilder.subHeaderStyle);
 			cell = row.createCell(cellnum++);
-			ExcelReportStyleBuilder.setValueWithFormatting(cell, "EG", ExcelReportStyleBuilder.subHeaderStyle);
+			ExcelReportStyleBuilder.setValueWithFormatting(cell, ApplicationConstant.REPORT_STRING_EG, ExcelReportStyleBuilder.subHeaderStyle);
 			cell = row.createCell(cellnum++);
-			ExcelReportStyleBuilder.setValueWithFormatting(cell, "Version", ExcelReportStyleBuilder.subHeaderStyle);
+			ExcelReportStyleBuilder.setValueWithFormatting(cell, ApplicationConstant.REPORT_STRING_VERSION, ExcelReportStyleBuilder.subHeaderStyle);
 		}
 		return ++currentRow;
 	}

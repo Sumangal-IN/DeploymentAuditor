@@ -3,7 +3,7 @@ insert into users(username,password,enabled) values
 ('admin','$2a$12$BHMZFp1aQs6NJ1zpPS4zjOWkuI3I9FC3AW8k10PUpKk8HnYOkrqUG',true);
 delete from user_roles;
 insert into user_roles(user_role_id,role,username) values
-(-1,'ROLE_ADMIN','admin');
+(0,'ROLE_ADMIN','admin');
 
 delete from deployment;
 /*ArticleHierarchy_notify-RS*/
