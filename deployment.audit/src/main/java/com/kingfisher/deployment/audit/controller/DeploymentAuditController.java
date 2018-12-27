@@ -22,7 +22,7 @@ import io.swagger.annotations.ApiParam;
 
 @RestController
 @Api(value = "DeploymentAudit")
-@RequestMapping("/deployment")
+//@RequestMapping("/deployment")
 public class DeploymentAuditController {
 
 	@Autowired
