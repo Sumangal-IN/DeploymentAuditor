@@ -34,7 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
          .antMatchers("/deployment/report*").hasAnyRole("ADMIN","AUDITOR")
          .antMatchers("/user/**").hasRole("ADMIN")
          .anyRequest().authenticated();
-	}
+	} 	
 
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {

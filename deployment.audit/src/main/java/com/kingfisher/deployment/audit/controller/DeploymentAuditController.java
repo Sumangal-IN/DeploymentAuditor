@@ -35,7 +35,7 @@ public class DeploymentAuditController {
 	 *            Deployments that need adding to the audit
 	 */
 	@ApiOperation("Add a set of deployments audits")
-	@PostMapping(value = "/audit", consumes = "application/json", produces = "application/json")
+	@RequestMapping(value = "/audit", consumes = "application/json", produces = "application/json")
 	public void audit(@ApiParam(value = "Deployments that need adding to the audit", required = true) @RequestBody List<Deployment> deployments) {
 		deploymentAuditService.recordDeployments(deployments);
 	}
