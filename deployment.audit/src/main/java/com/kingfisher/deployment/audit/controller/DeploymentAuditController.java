@@ -22,7 +22,7 @@ import io.swagger.annotations.ApiParam;
 
 @RestController
 @Api(value = "DeploymentAudit")
-//@RequestMapping("/deployment")
+@RequestMapping("/deployment")
 public class DeploymentAuditController {
 
 	@Autowired
@@ -31,32 +31,36 @@ public class DeploymentAuditController {
 	/**
 	 * Add a set of deployments audits
 	 * 
-	 * @param deployments
-	 *            Deployments that need adding to the audit
+	 * @param deployments Deployments that need adding to the audit
 	 */
 	@ApiOperation("Add a set of deployments audits")
-	@RequestMapping(value = "/audit", consumes = "application/json", produces = "application/json")
-	public void audit(@ApiParam(value = "Deployments that need adding to the audit", required = true) @RequestBody List<Deployment> deployments) {
-		deploymentAuditService.recordDeployments(deployments);
+	@PostMapping(value = "/audit", consumes = "application/json", produces = "application/json")
+	public List<Deployment> audit(
+			@ApiParam(value = "Deployments that need adding to the audit", required = true) @RequestBody List<Deployment> deployments) {
+		return deploymentAuditService.recordDeployments(deployments);
 	}
 
 	/**
 	 * Generates an Excel Report with application status across environments
 	 * 
-	 * @param referenceEnv
-	 *            Generate an Excel Report with application status across
-	 *            environments
-	 * @param reportingEnv
-	 *            List of environments to extract info for and compared against
-	 *            reference environment
+	 * @param referenceEnv Generate an Excel Report with application status across
+	 *                     environments
+	 * @param reportingEnv List of environments to extract info for and compared
+	 *                     against reference environment
 	 * @return report in excel format
 	 * @throws IOException
 	 */
 	@ApiOperation("Generates an Excel Report with application status across environments")
-	@GetMapping(value = "/report", produces = "application/vnd.ms-excel")
-	public ResponseEntity<byte[]> report(@ApiParam(value = " Generate an Excel Report with application status across environments", required = true) @RequestParam("referenceEnv") String referenceEnv, @ApiParam(value = "List of environments to extract info for and compared against reference environment", required = true) @RequestParam("reportingEnv") List<String> reportingEnv) throws IOException {
+	@GetMapping(value = "/audit/report", produces = "application/vnd.ms-excel")
+	public ResponseEntity<byte[]> report(
+			@ApiParam(value = " Generate an Excel Report with application status across environments", required = true) @RequestParam("referenceEnv") String referenceEnv,
+			@ApiParam(value = "List of environments to extract info for and compared against reference environment", required = true) @RequestParam("reportingEnv") List<String> reportingEnv)
+			throws IOException {
 		byte[] data = deploymentAuditService.createReport(referenceEnv, reportingEnv);
-		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + deploymentAuditService.getReportFileName()).contentLength(data.length) //
+		return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_DISPOSITION,
+						"attachment;filename=" + deploymentAuditService.getReportFileName())
+				.contentLength(data.length) //
 				.body(data);
 	}
 

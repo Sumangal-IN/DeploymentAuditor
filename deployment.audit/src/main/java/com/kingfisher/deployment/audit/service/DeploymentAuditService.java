@@ -2,6 +2,7 @@ package com.kingfisher.deployment.audit.service;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -34,22 +35,28 @@ public class DeploymentAuditService {
 		return excelReportBuilder.createReport(referenceEnv, reportingEnvs, reportData, "report");
 	}
 
-	private Map<String, List<Deployment>> prepareDataForApplication(String application, String referenceEnv, List<String> reportingEnvs) {
+	private Map<String, List<Deployment>> prepareDataForApplication(String application, String referenceEnv,
+			List<String> reportingEnvs) {
 		Map<String, List<Deployment>> latestDeploymentsInEnvironmentForApplication = new HashMap<>();
-		latestDeploymentsInEnvironmentForApplication.put(referenceEnv, deploymentRepository.findLatestDeploymentByApplicationNameAndEnvironment(referenceEnv, application));
+		latestDeploymentsInEnvironmentForApplication.put(referenceEnv,
+				deploymentRepository.findLatestDeploymentByApplicationNameAndEnvironment(referenceEnv, application));
 		for (String reportingEnv : reportingEnvs)
-			latestDeploymentsInEnvironmentForApplication.put(reportingEnv, deploymentRepository.findLatestDeploymentByApplicationNameAndEnvironment(reportingEnv, application));
+			latestDeploymentsInEnvironmentForApplication.put(reportingEnv, deploymentRepository
+					.findLatestDeploymentByApplicationNameAndEnvironment(reportingEnv, application));
 		return latestDeploymentsInEnvironmentForApplication;
 	}
 
-	public void recordDeployments(List<Deployment> deployments) {
+	public List<Deployment> recordDeployments(List<Deployment> deployments) {
+		List<Deployment> deploymentSuccess = new ArrayList<>();
 		for (Deployment deployment : deployments) {
 			deploymentRepository.save(deployment);
+			deploymentSuccess.add(deployment);
 		}
+		return deployments;
 	}
 
 	public String getReportFileName() {
-		return "report_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(new Date())+".xlsx";
+		return "report_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(new Date()) + ".xlsx";
 	}
 
 }
