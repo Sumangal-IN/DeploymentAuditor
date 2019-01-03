@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kingfisher.deployment.audit.security.config.CustomPasswordEncoder;
+import com.kingfisher.deployment.audit.security.codec.CustomPasswordEncoder;
 import com.kingfisher.deployment.audit.user.model.User;
 import com.kingfisher.deployment.audit.user.model.UserRole;
 import com.kingfisher.deployment.audit.user.repository.UserRepository;

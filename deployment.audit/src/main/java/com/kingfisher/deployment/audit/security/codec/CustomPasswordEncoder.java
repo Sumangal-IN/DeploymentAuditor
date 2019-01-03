@@ -1,4 +1,4 @@
-package com.kingfisher.deployment.audit.security.config;
+package com.kingfisher.deployment.audit.security.codec;
 
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -1,9 +1,14 @@
 delete from users;
 insert into users(username,password,enabled) values
-('admin','$2a$12$BHMZFp1aQs6NJ1zpPS4zjOWkuI3I9FC3AW8k10PUpKk8HnYOkrqUG',true);
+('admin','$2a$12$BHMZFp1aQs6NJ1zpPS4zjOWkuI3I9FC3AW8k10PUpKk8HnYOkrqUG',true),
+('jenkins','$2a$12$BHMZFp1aQs6NJ1zpPS4zjOWkuI3I9FC3AW8k10PUpKk8HnYOkrqUG',true),
+('auditor','$2a$12$BHMZFp1aQs6NJ1zpPS4zjOWkuI3I9FC3AW8k10PUpKk8HnYOkrqUG',true);
+
 delete from user_roles;
 insert into user_roles(user_role_id,role,username) values
-(0,'ROLE_ADMIN','admin');
+(-1,'ROLE_ADMIN','admin'),
+(-2,'ROLE_JENKINS','jenkins'),
+(-3,'ROLE_AUDITOR','auditor');
 
 delete from deployment;
 /*ArticleHierarchy_notify-RS*/
