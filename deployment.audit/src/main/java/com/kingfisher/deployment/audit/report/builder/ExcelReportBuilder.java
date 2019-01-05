@@ -12,12 +12,16 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.kingfisher.deployment.audit.constant.ApplicationConstant;
 
 @Component
 public class ExcelReportBuilder {
+	
+	@Autowired
+	ExcelReportDataOrganizer excelReportDataOrganizer;
 
 	/**
 	 * Creates xlsx report from the given deployment information across several
@@ -128,10 +132,13 @@ public class ExcelReportBuilder {
 	 * @return the row number after the end of the body
 	 */
 	private int createBody(int rownum, Sheet sheet, String referenceEnv, Map<String, Map<String, List<String[][]>>> reportData) {
+		
 		for (Entry<String, Map<String, List<String[][]>>> rowDataPerApplication : reportData.entrySet()) {
 			String applicationName = rowDataPerApplication.getKey();
 			Map<String, List<String[][]>> latestDeploymentsAllInstance = rowDataPerApplication.getValue();
 
+			excelReportDataOrganizer.organize(referenceEnv,latestDeploymentsAllInstance);
+			
 			int rowsRequiredForApplication = 1;
 			for (Map.Entry<String, List<String[][]>> rowDataPerApplicationPerInstance : latestDeploymentsAllInstance.entrySet())
 				if (rowsRequiredForApplication < rowDataPerApplicationPerInstance.getValue().size())

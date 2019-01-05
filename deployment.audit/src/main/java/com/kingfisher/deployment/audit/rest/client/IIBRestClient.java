@@ -1,5 +1,6 @@
 package com.kingfisher.deployment.audit.rest.client;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +42,8 @@ public class IIBRestClient {
 	@Autowired
 	RestTemplate restTemplate;
 
-	@Value("${IIBRestClient.host}")
-	private String host;
+	@Autowired
+	PasswordCodec passwordCodec;
 
 	@Value("${IIBRestClient.username}")
 	private String username;
@@ -57,21 +58,19 @@ public class IIBRestClient {
 	 * 
 	 * @param ExecutionGroup
 	 * @param ApplicationName
-	 * @return
 	 */
-	public IIBDeploymentStatus getDeployemntProperties(String ExecutionGroup, String ApplicationName) throws URISyntaxException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
+	public IIBDeploymentStatus getDeployemntProperties(String ExecutionGroup, String ApplicationName) throws URISyntaxException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException {
 		URI uri = new URI(ApplicationConstant.IIB_API_URL_EG_APP.replace(ApplicationConstant.IIB_API_PLACEHOLDER_EG, ExecutionGroup).replace(ApplicationConstant.IIB_API_PLACEHOLDER_APP, ApplicationName));
 		HttpEntity<String> httpEntity = new HttpEntity<>(getHeaderWithAuth());
 		ResponseEntity<IIBDeploymentStatus> response = restTemplate.exchange(uri, HttpMethod.GET, httpEntity, IIBDeploymentStatus.class);
 		return response.getBody();
 	}
 
-	private HttpHeaders getHeaderWithAuth() throws InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
+	private HttpHeaders getHeaderWithAuth() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		;
-		headers.setBasicAuth(new PasswordCodec(key).decrypt(username), new PasswordCodec(key).decrypt(password));
+		headers.setBasicAuth(passwordCodec.decrypt(key, username), passwordCodec.decrypt(key, password));
 		return headers;
 	}
 

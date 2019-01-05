@@ -77,7 +77,7 @@ public class DeploymentAuditService {
 		List<String[][]> properties = new ArrayList<>();
 		for (Deployment deployment : deployments) {
 			String[][] prop = new String[3][2];
-			prop[0][0] = deployment.getInstanceName(); // Instance
+			prop[0][0] = deployment.getInstanceName(); // Env
 			prop[0][1] = null;
 			prop[1][0] = deployment.getIntegrationServer(); // EG
 			prop[1][1] = null;
@@ -96,16 +96,8 @@ public class DeploymentAuditService {
 	 * @return
 	 */
 	public void recordDeployments(Deployment deployment) {
-		String integrationServer = deployment.getIntegrationServer();
-
-		deployment = updateFromIIB(deployment);
 		deploymentRepository.save(deployment);
 
-	}
-
-	private Deployment updateFromIIB(Deployment deployment) {
-
-		return null;
 	}
 
 	/**

@@ -13,11 +13,17 @@ insert into user_roles(user_role_id,role,username) values
 delete from deployment;
 /*ArticleHierarchy_notify-RS*/
 insert into deployment
-(deployment_id,application_name,environment,instance_name,integration_server,bar_release_id,created_time) values
-(20,'ArticleHierarchy_notify-RS','P','*','MDAT','F2522.12.12',sysdate),
-(21,'ArticleHierarchy_notify-RS','F','*','MDAT','F2522.12.12',sysdate+1),
-(22,'ArticleHierarchy_notify-RS','V','*','MDAT','F2522.12.12',sysdate+2),
-(23,'ArticleHierarchy_notify-RS','Q','*','MDAT','F2522.12.12',sysdate+3);
+(application_name,environment,instance_name,integration_server,bar_release_id,created_time) values
+('ArticleHierarchy_notify-RS','P','PIIBINST1','MDAT','F2522.12.12',sysdate),
+('ArticleHierarchy_notify-RS','P','PIIBINST2','MDAT','F2522.12.12',sysdate),
+('ArticleHierarchy_notify-RS','P','PIIBINST3','MDAT','F2522.12.12',sysdate),
+('ArticleHierarchy_notify-RS','P','PIIBINST4','MDAT','F2522.12.12',sysdate),
+('ArticleHierarchy_notify-RS','F','FIIBINST1','MDAT','F2522.12.12',sysdate+1),
+('ArticleHierarchy_notify-RS','V','VIIBINST1','MDAT','F2522.12.12',sysdate+2),
+('ArticleHierarchy_notify-RS','Q','QIIBINST1','MDAT','F2522.12.12',sysdate+3);
+('ArticleHierarchy_notify-RS','Q','QIIBINST2','MDAT','F2522.12.12',sysdate+3);
+('ArticleHierarchy_notify-RS','Q','QIIBINST3','MDAT','F2522.12.12',sysdate+3);
+('ArticleHierarchy_notify-RS','Q','QIIBINST4','MDAT','F2522.12.12',sysdate+3);
 /*Product_Gateway_V2*/
 insert into deployment
 (deployment_id,application_name,environment,instance_name,integration_server,bar_release_id,created_time) values
