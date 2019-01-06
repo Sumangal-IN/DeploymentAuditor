@@ -63,7 +63,7 @@ public class ExcelReportDataOrganizer {
 				prop[2] = deployment.getBarReleaseId(); // Version
 				properties.add(prop);
 			}
-			fillInstances(rowDataPerApplication.getKey(), properties);
+			//fillInstances(instanceRepository.findByTier(rowDataPerApplication.getKey()), properties);
 			properties = mergeInstances(properties);
 			deploymentProperties.put(rowDataPerApplication.getKey(), properties);
 		}
@@ -88,6 +88,8 @@ public class ExcelReportDataOrganizer {
 				addInstanceNumber(matchedProperty, property);
 			}
 		}
+		if(mergedProperties.size()==1)
+			mergedProperties.get(0)[0]="*";
 		return mergedProperties;
 	}
 
@@ -110,8 +112,7 @@ public class ExcelReportDataOrganizer {
 		return instance.substring(0, instance.length() - 1);
 	}
 
-	private void fillInstances(String tier, List<String[]> properties) {
-		List<Instance> availableInstances = instanceRepository.findByTier(tier);
+	private void fillInstances(List<Instance> availableInstances, List<String[]> properties) {
 		for (Instance instance : availableInstances) {
 			boolean match = false;
 			for (String[] property : properties) {
@@ -162,7 +163,7 @@ public class ExcelReportDataOrganizer {
 
 	private String[] matchOnVersion(List<String[]> referenceDeployments, String[] reportingDeployment) {
 		for (String[] referenceDeployment : referenceDeployments) {
-			if (reportingDeployment[1].equals(referenceDeployment[1])) {
+			if (reportingDeployment[2].equals(referenceDeployment[2])) {
 				return referenceDeployment;
 			}
 		}
@@ -281,10 +282,12 @@ public class ExcelReportDataOrganizer {
 	private boolean isReferenceAmbiguous(List<String[]> referenceDeployments) {
 		String version = null;
 		for (String[] referenceDeployment : referenceDeployments) {
-			if (version == null)
-				version = referenceDeployment[2];
-			else if (version != referenceDeployment[2])
-				return true;
+			if (!referenceDeployment[2].equals("NA")) {
+				if (version == null)
+					version = referenceDeployment[2];
+				else if (version != referenceDeployment[2])
+					return true;
+			}
 		}
 		return false;
 	}

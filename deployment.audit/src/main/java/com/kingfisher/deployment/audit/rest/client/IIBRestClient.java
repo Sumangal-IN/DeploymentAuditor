@@ -42,7 +42,7 @@ public class IIBRestClient {
 	@Autowired
 	RestTemplate restTemplate;
 
-	//@Autowired
+	// @Autowired
 	PasswordCodec passwordCodec;
 
 	@Value("${IIBRestClient.username}")
@@ -59,14 +59,21 @@ public class IIBRestClient {
 	 * @param ExecutionGroup
 	 * @param ApplicationName
 	 */
-	public IIBDeploymentStatus getDeployemntProperties(String ExecutionGroup, String ApplicationName) throws URISyntaxException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException {
-		URI uri = new URI(ApplicationConstant.IIB_API_URL_EG_APP.replace(ApplicationConstant.IIB_API_PLACEHOLDER_EG, ExecutionGroup).replace(ApplicationConstant.IIB_API_PLACEHOLDER_APP, ApplicationName));
+	public IIBDeploymentStatus getDeployemntProperties(String executionGroup, String applicationName)
+			throws URISyntaxException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
+			InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException,
+			UnsupportedEncodingException {
+		URI uri = new URI(ApplicationConstant.IIB_API_URL_EG_APP
+				.replace(ApplicationConstant.IIB_API_PLACEHOLDER_EG, executionGroup)
+				.replace(ApplicationConstant.IIB_API_PLACEHOLDER_APP, applicationName));
 		HttpEntity<String> httpEntity = new HttpEntity<>(getHeaderWithAuth());
-		ResponseEntity<IIBDeploymentStatus> response = restTemplate.exchange(uri, HttpMethod.GET, httpEntity, IIBDeploymentStatus.class);
+		ResponseEntity<IIBDeploymentStatus> response = restTemplate.exchange(uri, HttpMethod.GET, httpEntity,
+				IIBDeploymentStatus.class);
 		return response.getBody();
 	}
 
-	private HttpHeaders getHeaderWithAuth() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException {
+	private HttpHeaders getHeaderWithAuth() throws InvalidKeyException, NoSuchAlgorithmException,
+			NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -82,7 +89,8 @@ public class IIBRestClient {
 	@Bean
 	public RestTemplate restTemplate() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
 		TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
-		SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
+		SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy)
+				.build();
 		SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
 		CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(csf).build();
 		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
