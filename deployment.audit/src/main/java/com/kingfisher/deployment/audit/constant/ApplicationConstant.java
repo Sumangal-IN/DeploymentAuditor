@@ -20,7 +20,7 @@ public class ApplicationConstant {
 
 	public static final String REPORT_STRING_APPLICATION_NAME = "Application Name";
 	public static final String REPORT_STRING_STATUS = "Status";
-	public static final String REPORT_STRING_INSTANCE = "Env";
+	public static final String REPORT_STRING_INSTANCE = "Instance";
 	public static final String REPORT_STRING_EG = "EG";
 	public static final String REPORT_STRING_VERSION = "Version";
 

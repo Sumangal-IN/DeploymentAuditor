@@ -1,8 +1,19 @@
 package com.kingfisher.deployment.audit.data.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "Instance")
 public class Instance {
-	private String tier;
+	@Id
+	@Column(name = "instance_name")
 	private String instanceName;
+	@Column(name = "tier")
+	private String tier;
+	@Column(name = "host")
 	private String host;
 
 	public Instance() {

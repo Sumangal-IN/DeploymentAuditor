@@ -2,7 +2,6 @@ package com.kingfisher.deployment.audit.service;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +42,7 @@ public class DeploymentAuditService {
 	public byte[] createReport(String referenceEnv, List<String> reportingEnvs) throws IOException {
 		List<String> applications = deploymentRepository.findApplicationNameByEnvironment(referenceEnv);
 
-		Map<String, Map<String, List<String[][]>>> reportData = new TreeMap<>();
+		Map<String, Map<String, List<Deployment>>> reportData = new TreeMap<>();
 		for (String application : applications)
 			reportData.put(application, prepareDataForApplication(application, referenceEnv, reportingEnvs));
 
@@ -57,35 +56,15 @@ public class DeploymentAuditService {
 	 * @param reportingEnvs
 	 * @return
 	 */
-	private Map<String, List<String[][]>> prepareDataForApplication(String application, String referenceEnv, List<String> reportingEnvs) {
-		Map<String, List<String[][]>> latestDeploymentsInEnvironmentForApplication = new HashMap<>();
-		latestDeploymentsInEnvironmentForApplication.put(referenceEnv, getReportProperties(deploymentRepository.findLatestDeploymentByApplicationNameAndEnvironment(referenceEnv, application)));
+	private Map<String, List<Deployment>> prepareDataForApplication(String application, String referenceEnv,
+			List<String> reportingEnvs) {
+		Map<String, List<Deployment>> latestDeploymentsInEnvironmentForApplication = new HashMap<>();
+		latestDeploymentsInEnvironmentForApplication.put(referenceEnv,
+				deploymentRepository.findLatestDeploymentByApplicationNameAndEnvironment(referenceEnv, application));
 		for (String reportingEnv : reportingEnvs)
-			latestDeploymentsInEnvironmentForApplication.put(reportingEnv, getReportProperties(deploymentRepository.findLatestDeploymentByApplicationNameAndEnvironment(reportingEnv, application)));
+			latestDeploymentsInEnvironmentForApplication.put(reportingEnv, deploymentRepository
+					.findLatestDeploymentByApplicationNameAndEnvironment(reportingEnv, application));
 		return latestDeploymentsInEnvironmentForApplication;
-	}
-
-	/**
-	 * Extracts the field required for report from deployment records
-	 * 
-	 * @param deployments
-	 *            list of deployment statuses
-	 * @return {@code String[][]} for each deployment statuses containing the fields
-	 *         values for the report
-	 */
-	private List<String[][]> getReportProperties(List<Deployment> deployments) {
-		List<String[][]> properties = new ArrayList<>();
-		for (Deployment deployment : deployments) {
-			String[][] prop = new String[3][2];
-			prop[0][0] = deployment.getInstanceName(); // Env
-			prop[0][1] = null;
-			prop[1][0] = deployment.getIntegrationServer(); // EG
-			prop[1][1] = null;
-			prop[2][0] = deployment.getBarReleaseId(); // Version
-			prop[2][1] = null;
-			properties.add(prop);
-		}
-		return properties;
 	}
 
 	/**

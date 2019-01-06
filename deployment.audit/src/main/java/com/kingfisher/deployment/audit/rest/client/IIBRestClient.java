@@ -42,7 +42,7 @@ public class IIBRestClient {
 	@Autowired
 	RestTemplate restTemplate;
 
-	@Autowired
+	//@Autowired
 	PasswordCodec passwordCodec;
 
 	@Value("${IIBRestClient.username}")

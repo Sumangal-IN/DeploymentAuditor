@@ -16,10 +16,10 @@ import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class PasswordCodec {
 
-	@Value("${ivParam}")
+	//@Value("${ivParam}")
 	String ivParam; // "hsifgnik"
 
 	public String encrypt(String keyBytes, String input) throws InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {

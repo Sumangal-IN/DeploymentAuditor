@@ -16,10 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.kingfisher.deployment.audit.constant.ApplicationConstant;
+import com.kingfisher.deployment.audit.data.model.Deployment;
+import com.kingfisher.deployment.audit.report.model.ReportCell;
 
 @Component
 public class ExcelReportBuilder {
-	
+
 	@Autowired
 	ExcelReportDataOrganizer excelReportDataOrganizer;
 
@@ -39,7 +41,8 @@ public class ExcelReportBuilder {
 	 * @return {@code byte[]} representing the xlsx file
 	 * @throws IOException
 	 */
-	public byte[] createReport(String referenceEnv, List<String> reportingEnv, Map<String, Map<String, List<String[][]>>> reportData, String sheetName) throws IOException {
+	public byte[] createReport(String referenceEnv, List<String> reportingEnv,
+			Map<String, Map<String, List<Deployment>>> reportData, String sheetName) throws IOException {
 		Workbook workbook = new XSSFWorkbook();
 		ExcelReportStyleBuilder.addStyles(workbook);
 		Sheet sheet = workbook.createSheet(sheetName);
@@ -103,16 +106,21 @@ public class ExcelReportBuilder {
 		// skipping first 1 cell
 		int cellnum = 1;
 		Cell cell = row.createCell(cellnum++);
-		ExcelReportStyleBuilder.setValueWithFormatting(cell, ApplicationConstant.REPORT_STRING_APPLICATION_NAME, ExcelReportStyleBuilder.subHeaderStyle);
+		ExcelReportStyleBuilder.setValueWithFormatting(cell, ApplicationConstant.REPORT_STRING_APPLICATION_NAME,
+				ExcelReportStyleBuilder.subHeaderStyle);
 		cell = row.createCell(cellnum++);
-		ExcelReportStyleBuilder.setValueWithFormatting(cell, ApplicationConstant.REPORT_STRING_STATUS, ExcelReportStyleBuilder.subHeaderStyle);
+		ExcelReportStyleBuilder.setValueWithFormatting(cell, ApplicationConstant.REPORT_STRING_STATUS,
+				ExcelReportStyleBuilder.subHeaderStyle);
 		for (int i = 0; i <= reportingEnv.size(); i++) {
 			cell = row.createCell(cellnum++);
-			ExcelReportStyleBuilder.setValueWithFormatting(cell, ApplicationConstant.REPORT_STRING_INSTANCE, ExcelReportStyleBuilder.subHeaderStyle);
+			ExcelReportStyleBuilder.setValueWithFormatting(cell, ApplicationConstant.REPORT_STRING_INSTANCE,
+					ExcelReportStyleBuilder.subHeaderStyle);
 			cell = row.createCell(cellnum++);
-			ExcelReportStyleBuilder.setValueWithFormatting(cell, ApplicationConstant.REPORT_STRING_EG, ExcelReportStyleBuilder.subHeaderStyle);
+			ExcelReportStyleBuilder.setValueWithFormatting(cell, ApplicationConstant.REPORT_STRING_EG,
+					ExcelReportStyleBuilder.subHeaderStyle);
 			cell = row.createCell(cellnum++);
-			ExcelReportStyleBuilder.setValueWithFormatting(cell, ApplicationConstant.REPORT_STRING_VERSION, ExcelReportStyleBuilder.subHeaderStyle);
+			ExcelReportStyleBuilder.setValueWithFormatting(cell, ApplicationConstant.REPORT_STRING_VERSION,
+					ExcelReportStyleBuilder.subHeaderStyle);
 		}
 		return ++rownum;
 	}
@@ -131,61 +139,44 @@ public class ExcelReportBuilder {
 	 *            applications in different environments
 	 * @return the row number after the end of the body
 	 */
-	private int createBody(int rownum, Sheet sheet, String referenceEnv, Map<String, Map<String, List<String[][]>>> reportData) {
-		
-		for (Entry<String, Map<String, List<String[][]>>> rowDataPerApplication : reportData.entrySet()) {
+	private int createBody(int rownum, Sheet sheet, String referenceEnv,
+			Map<String, Map<String, List<Deployment>>> reportData) {
+
+		for (Entry<String, Map<String, List<Deployment>>> rowDataPerApplication : reportData.entrySet()) {
 			String applicationName = rowDataPerApplication.getKey();
-			Map<String, List<String[][]>> latestDeploymentsAllInstance = rowDataPerApplication.getValue();
+			Map<String, List<Deployment>> latestDeploymentsAllInstance = rowDataPerApplication.getValue();
 
-			excelReportDataOrganizer.organize(referenceEnv,latestDeploymentsAllInstance);
-			
-			int rowsRequiredForApplication = 1;
-			for (Map.Entry<String, List<String[][]>> rowDataPerApplicationPerInstance : latestDeploymentsAllInstance.entrySet())
-				if (rowsRequiredForApplication < rowDataPerApplicationPerInstance.getValue().size())
-					rowsRequiredForApplication = rowDataPerApplicationPerInstance.getValue().size();
+			List<ReportCell[]> organizedReportRows = excelReportDataOrganizer.organize(referenceEnv,
+					latestDeploymentsAllInstance);
 
-			rownum = createRowsForApplication(applicationName, referenceEnv, rownum, sheet, latestDeploymentsAllInstance, rowsRequiredForApplication);
+			rownum = createRowsForApplication(applicationName, rownum, sheet, organizedReportRows);
 		}
 		return rownum;
 	}
 
-	/**
-	 * 
-	 * @param applicationName
-	 * @param referenceEnv
-	 * @param currentRow
-	 * @param sheet
-	 * @param latestDeploymentsAllInstance
-	 * @param rowsRequiredForApplication
-	 * @return
-	 */
-	private int createRowsForApplication(String applicationName, String referenceEnv, int currentRow, Sheet sheet, Map<String, List<String[][]>> latestDeploymentsAllInstance, int rowsRequiredForApplication) {
-		for (int rownum = 0; rownum < rowsRequiredForApplication; rownum++) {
+	private int createRowsForApplication(String applicationName, int currentRow, Sheet sheet,
+			List<ReportCell[]> organizedReportRows) {
+		boolean printAppNameStatus = true;
+		for (ReportCell[] organizedReportRow : organizedReportRows) {
 			Row row = ExcelReportStyleBuilder.formatRow(sheet.createRow(currentRow), "body");
 			int cellnum = 0;
-			/* application name at column 1 */
-			if (rownum == 0) {
+			if (printAppNameStatus) {
 				Cell cell = row.createCell(++cellnum);
-				ExcelReportStyleBuilder.setValueWithFormatting(cell, applicationName, ExcelReportStyleBuilder.bodyStyle);
-				/*
-				 * application status at column 2 will be filled as per anomaly calculation
-				 */
+				ExcelReportStyleBuilder.setValueWithFormatting(cell, applicationName,
+						ExcelReportStyleBuilder.bodyStyle);
 				cell = row.createCell(++cellnum);
-				if (calculateAnomlay(referenceEnv, latestDeploymentsAllInstance)) {
-					ExcelReportStyleBuilder.setValueWithFormatting(cell, "û", ExcelReportStyleBuilder.bodyStyleSpecialCharacterRed);
-				} else {
-					ExcelReportStyleBuilder.setValueWithFormatting(cell, "ü", ExcelReportStyleBuilder.bodyStyleSpecialCharacterGreen);
-				}
+				ExcelReportStyleBuilder.setValueWithFormatting(cell, "û",
+						ExcelReportStyleBuilder.bodyStyleSpecialCharacterRed);
+				ExcelReportStyleBuilder.setValueWithFormatting(cell, "ü",
+						ExcelReportStyleBuilder.bodyStyleSpecialCharacterGreen);
+				printAppNameStatus = false;
 			} else {
 				Cell cell = row.createCell(++cellnum);
 				ExcelReportStyleBuilder.setValueWithFormatting(cell, "", ExcelReportStyleBuilder.bodyStyle);
 				cell = row.createCell(++cellnum);
 				ExcelReportStyleBuilder.setValueWithFormatting(cell, "", ExcelReportStyleBuilder.bodyStyle);
 			}
-
-			for (Map.Entry<String, List<String[][]>> rowDataPerApplicationPerInstance : latestDeploymentsAllInstance.entrySet()) {
-				cellnum = createRowForApplication(rownum, rowDataPerApplicationPerInstance, cellnum, row);
-			}
+			createRowForApplication(organizedReportRow, cellnum, row);
 			currentRow++;
 		}
 		return currentRow;
@@ -199,40 +190,15 @@ public class ExcelReportBuilder {
 	 * @param row
 	 * @return
 	 */
-	private int createRowForApplication(int rownum, Entry<String, List<String[][]>> rowDataPerApplicationPerInstance, int cellnum, Row row) {
+	private void createRowForApplication(ReportCell[] organizedReportRow, int cellnum, Row row) {
 		/* there are data for current row */
 		Cell cell = null;
-		if (rownum < rowDataPerApplicationPerInstance.getValue().size()) {
-			String[][] param = rowDataPerApplicationPerInstance.getValue().get(rownum);
+		for (int i = 0; i < organizedReportRow.length; i++) {
 			cell = row.createCell(++cellnum);
-			ExcelReportStyleBuilder.setValueWithFormatting(cell, param[0][0], param[0][1] == null ? ExcelReportStyleBuilder.bodyStyle : ExcelReportStyleBuilder.bodyStyleAlert);
-			cell = row.createCell(++cellnum);
-			ExcelReportStyleBuilder.setValueWithFormatting(cell, param[1][0], param[1][1] == null ? ExcelReportStyleBuilder.bodyStyle : ExcelReportStyleBuilder.bodyStyleAlert);
-			cell = row.createCell(++cellnum);
-			ExcelReportStyleBuilder.setValueWithFormatting(cell, param[2][0], param[2][1] == null ? ExcelReportStyleBuilder.bodyStyle : ExcelReportStyleBuilder.bodyStyleAlert);
+			ExcelReportStyleBuilder.setValueWithFormatting(cell, organizedReportRow[i].getValue(),
+					organizedReportRow[i].isAmbiguous() ? ExcelReportStyleBuilder.bodyStyleAlert
+							: ExcelReportStyleBuilder.bodyStyle);
 		}
-		/** there is no data for current row */
-		else {
-			cell = row.createCell(++cellnum);
-			ExcelReportStyleBuilder.setValueWithFormatting(cell, "", ExcelReportStyleBuilder.bodyStyle);
-			cell = row.createCell(++cellnum);
-			ExcelReportStyleBuilder.setValueWithFormatting(cell, "", ExcelReportStyleBuilder.bodyStyle);
-			cell = row.createCell(++cellnum);
-			ExcelReportStyleBuilder.setValueWithFormatting(cell, "", ExcelReportStyleBuilder.bodyStyle);
-		}
-		return cellnum;
-	}
-
-	/**
-	 * Calculates anomaly in the application state across different environments
-	 * 
-	 * @param referenceEnv
-	 * @param latestDeploymentsAllInstance
-	 * @return
-	 */
-	private boolean calculateAnomlay(String referenceEnv, Map<String, List<String[][]>> latestDeploymentsAllInstance) {
-		latestDeploymentsAllInstance.get(referenceEnv).get(0)[0][1] = "true";
-		return false;
 	}
 
 	/**
