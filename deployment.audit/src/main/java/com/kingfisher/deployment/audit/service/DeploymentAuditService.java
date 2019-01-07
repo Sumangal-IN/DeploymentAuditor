@@ -56,14 +56,11 @@ public class DeploymentAuditService {
 	 * @param reportingEnvs
 	 * @return
 	 */
-	private Map<String, List<Deployment>> prepareDataForApplication(String application, String referenceEnv,
-			List<String> reportingEnvs) {
+	private Map<String, List<Deployment>> prepareDataForApplication(String application, String referenceEnv, List<String> reportingEnvs) {
 		Map<String, List<Deployment>> latestDeploymentsInEnvironmentForApplication = new HashMap<>();
-		latestDeploymentsInEnvironmentForApplication.put(referenceEnv,
-				deploymentRepository.findLatestDeploymentByApplicationNameAndEnvironment(referenceEnv, application));
+		latestDeploymentsInEnvironmentForApplication.put(referenceEnv, deploymentRepository.findLatestDeploymentByApplicationNameAndEnvironment(referenceEnv, application));
 		for (String reportingEnv : reportingEnvs)
-			latestDeploymentsInEnvironmentForApplication.put(reportingEnv, deploymentRepository
-					.findLatestDeploymentByApplicationNameAndEnvironment(reportingEnv, application));
+			latestDeploymentsInEnvironmentForApplication.put(reportingEnv, deploymentRepository.findLatestDeploymentByApplicationNameAndEnvironment(reportingEnv, application));
 		return latestDeploymentsInEnvironmentForApplication;
 	}
 
