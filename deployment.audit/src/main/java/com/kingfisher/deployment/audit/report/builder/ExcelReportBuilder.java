@@ -2,9 +2,11 @@ package com.kingfisher.deployment.audit.report.builder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -80,7 +82,10 @@ public class ExcelReportBuilder {
 		ExcelReportStyleBuilder.setValueWithFormatting(cell, referenceEnv, ExcelReportStyleBuilder.headerStyle);
 		sheet.addMergedRegion(new CellRangeAddress(rownum, rownum, cellnum, cellnum + 2));
 		cellnum += 3;
-		for (String env : reportingEnv) {
+		Set<String> orderedReportingEnv = new HashSet<>();
+		for (String env : reportingEnv)
+			orderedReportingEnv.add(env);
+		for (String env : orderedReportingEnv) {
 			cell = row.createCell(cellnum);
 			ExcelReportStyleBuilder.setValueWithFormatting(cell, env, ExcelReportStyleBuilder.headerStyle);
 			sheet.addMergedRegion(new CellRangeAddress(rownum, rownum, cellnum, cellnum + 2));
@@ -134,7 +139,6 @@ public class ExcelReportBuilder {
 	 * @return the row number after the end of the body
 	 */
 	private int createBody(int rownum, Sheet sheet, String referenceEnv, Map<String, Map<String, List<Deployment>>> reportData) {
-
 		for (Entry<String, Map<String, List<Deployment>>> rowDataPerApplication : reportData.entrySet()) {
 			String applicationName = rowDataPerApplication.getKey();
 			Map<String, List<Deployment>> latestDeploymentsAllInstance = rowDataPerApplication.getValue();
