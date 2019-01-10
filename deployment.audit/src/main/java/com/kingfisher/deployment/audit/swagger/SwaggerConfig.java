@@ -15,7 +15,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class SwaggerConfig {
 	@Bean
 	public Docket deploymentAuditApi() {
-		return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.basePackage("com.kingfisher.deployment.audit.controller"))/* .paths(regex("/User.*")) */.build().apiInfo(metaData());
+		return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.basePackage("com.kingfisher.deployment.audit.controller"))/* .paths(regex("/User.*")) */.build().apiInfo(metaData()).useDefaultResponseMessages(false);
 	}
 
 	private ApiInfo metaData() {
