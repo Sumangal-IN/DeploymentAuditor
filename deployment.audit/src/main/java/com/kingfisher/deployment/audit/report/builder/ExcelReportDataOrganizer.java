@@ -107,22 +107,20 @@ public class ExcelReportDataOrganizer {
 
 	private void compareReportingWithReferencebyVerison(Map<String, List<String[]>> latestDeploymentsAllInstance, String[] environments, String referenceEnv, List<ReportCell[]> virtualRows) {
 		int maxInstances = calculateMaxRowRequired(latestDeploymentsAllInstance, environments, referenceEnv, true);
-		List<String[]> referenceEnvData=new ArrayList<>(latestDeploymentsAllInstance.get(referenceEnv));
+		List<String[]> referenceEnvData = new ArrayList<>(latestDeploymentsAllInstance.get(referenceEnv));
 		for (int ins_row_num = 0; ins_row_num < maxInstances; ins_row_num++) {
 			ReportCell[] virtualRow = prepareVirtualRow(latestDeploymentsAllInstance.size() * FIELD_COUNT);
 			for (int env_num = 0; env_num < environments.length; env_num++) {
 				if (latestDeploymentsAllInstance.get(environments[env_num]).isEmpty()) {
 					populateRow(virtualRow, null, null, env_num, DataFlag.PLACE_ALL_BLANK, AmbiguousFlag.MARK_ALL_UNAMBIGUOUS);
 				} else {
-						String[] data = latestDeploymentsAllInstance.get(environments[env_num]).get(0);
-						if (data[0].equals("NA"))
-							populateRow(virtualRow, data, null, env_num, DataFlag.PLACE_AS_PER_DATA, AmbiguousFlag.MARK_ALL_AMBIGUOUS);
-						else {
-							//if (environments[env_num].equals(referenceEnv))
-								//populateRow(virtualRow, data, null, env_num, DataFlag.PLACE_AS_PER_DATA, AmbiguousFlag.MARK_ALL_UNAMBIGUOUS);
-							Set<Integer> markAmbiguous = calculateAmbiguousFields(referenceEnvData, data);
-							populateRow(virtualRow, data, markAmbiguous, env_num, DataFlag.PLACE_AS_PER_DATA, AmbiguousFlag.MARK_AS_PER_DATA);
-						}
+					String[] data = latestDeploymentsAllInstance.get(environments[env_num]).get(0);
+					if (data[0].equals("NA"))
+						populateRow(virtualRow, data, null, env_num, DataFlag.PLACE_AS_PER_DATA, AmbiguousFlag.MARK_ALL_AMBIGUOUS);
+					else {
+						Set<Integer> markAmbiguous = calculateAmbiguousFields(referenceEnvData, data);
+						populateRow(virtualRow, data, markAmbiguous, env_num, DataFlag.PLACE_AS_PER_DATA, AmbiguousFlag.MARK_AS_PER_DATA);
+					}
 					latestDeploymentsAllInstance.get(environments[env_num]).remove(0);
 				}
 			}
@@ -158,71 +156,8 @@ public class ExcelReportDataOrganizer {
 				markAmbiguous.add(2);
 			}
 		}
-
 		return markAmbiguous;
 	}
-
-	// private String[] matchOnVersion(List<String[]> referenceDeployments, String[]
-	// reportingDeployment) {
-	// for (String[] referenceDeployment : referenceDeployments) {
-	// if (reportingDeployment[2].equals(referenceDeployment[2])) {
-	// return referenceDeployment;
-	// }
-	// }
-	// return new String[0];
-	// }
-	//
-	// private String[] matchOnEG(List<String[]> referenceDeployments, String[]
-	// reportingDeployment) {
-	// for (String[] referenceDeployment : referenceDeployments) {
-	// if (reportingDeployment[1].equals(referenceDeployment[2])) {
-	// return referenceDeployment;
-	// }
-	// }
-	// return new String[0];
-	// }
-
-	// private void compareReferenceWithReportingbyEG(Map<String, List<String[]>>
-	// latestDeploymentsAllInstance, String[] environments, String referenceEnv,
-	// List<ReportCell[]> virtualRows) {
-	// for (String[] referenceDeployment :
-	// latestDeploymentsAllInstance.get(referenceEnv)) {
-	// ReportCell[] virtualRow =
-	// prepareVirtualRow(latestDeploymentsAllInstance.size() * FIELD_COUNT);
-	// for (int env_num = 0; env_num < environments.length; env_num++) {
-	// if (environments[env_num].equals(referenceEnv))
-	// populateRow(virtualRow, referenceDeployment, null, env_num,
-	// DataFlag.PLACE_AS_PER_DATA, AmbiguousFlag.MARK_ALL_UNAMBIGUOUS);
-	// else {
-	// String[] matchedEGDeployment = matchOnEG(referenceDeployment,
-	// latestDeploymentsAllInstance.get(environments[env_num]));
-	// if (matchedEGDeployment.length == 0)
-	// populateRow(virtualRow, null, null, env_num, DataFlag.PLACE_ALL_NA,
-	// AmbiguousFlag.MARK_ALL_AMBIGUOUS);
-	// else {
-	// Set<Integer> markAmbiguous = new HashSet<>();
-	// if (!matchedEGDeployment[2].equals(referenceDeployment[2]))
-	// markAmbiguous.add(2);
-	// populateRow(virtualRow, matchedEGDeployment, markAmbiguous, env_num,
-	// DataFlag.PLACE_AS_PER_DATA, AmbiguousFlag.MARK_AS_PER_DATA);
-	// }
-	// }
-	// }
-	// virtualRows.add(virtualRow);
-	// }
-	// }
-
-	// private String[] matchOnEG(String[] referenceDeployment, List<String[]>
-	// reportingDeployments) {
-	// for (String[] reportingDeployment : reportingDeployments) {
-	// if (reportingDeployment[1].equals(referenceDeployment[1])) {
-	// String[] deployment = reportingDeployment;
-	// reportingDeployments.remove(reportingDeployment);
-	// return deployment;
-	// }
-	// }
-	// return new String[0];
-	// }
 
 	private void markReferenceAsAmbiguous(Map<String, List<String[]>> latestDeploymentsAllInstance, String[] environments, String referenceEnv, List<ReportCell[]> virtualRows) {
 		int maxInstances = calculateMaxRowRequired(latestDeploymentsAllInstance, environments, referenceEnv, true);
@@ -237,8 +172,8 @@ public class ExcelReportDataOrganizer {
 						populateRow(virtualRow, data, null, env_num, DataFlag.PLACE_AS_PER_DATA, AmbiguousFlag.MARK_ALL_AMBIGUOUS);
 					else {
 						populateRow(virtualRow, data, null, env_num, DataFlag.PLACE_AS_PER_DATA, AmbiguousFlag.MARK_ALL_UNAMBIGUOUS);
-						latestDeploymentsAllInstance.get(environments[env_num]).remove(0);
 					}
+					latestDeploymentsAllInstance.get(environments[env_num]).remove(0);
 				}
 			}
 			virtualRows.add(virtualRow);

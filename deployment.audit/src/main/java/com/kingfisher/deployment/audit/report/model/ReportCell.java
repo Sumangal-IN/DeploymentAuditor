@@ -29,4 +29,9 @@ public class ReportCell {
 		this.ambiguous = ambiguous;
 	}
 
+	@Override
+	public String toString() {
+		return "ReportCell [value=" + value + ", ambiguous=" + ambiguous + "]";
+	}
+
 }
