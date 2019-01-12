@@ -8,22 +8,30 @@ buildscript {
         maven {
         	url "https://plugins.gradle.org/m2/"
         }
+        flatDir {
+       		dirs 'libs'
+   		}
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-		classpath 'com.h2database:h2:1.4.187'
+		classpath 'com.oracle:ojdbc8:12.2.0.2'
+    	classpath "org.liquibase:liquibase-gradle-plugin:1.1.1"
 	}
 }
 
-plugins {
-    id "org.flywaydb.flyway" version "5.2.4"
-}
+apply plugin: 'liquibase'
 
-flyway {
-    url = 'jdbc:h2:file:c:\\dev\\audit'
-    user = 'auditor'
-    password = 'password'
-    baselineOnMigrate = 'true'
+def changeLog = "$projectDir/src/main/resources/db/changelog.xml"
+
+liquibase {
+    activities {
+        main {
+            url 'jdbc:oracle:thin:@//unxs0613.ghanp.kfplc.com:1527/ETIIB101'
+	        username 'INT_INVENTORY'
+	        password 'Exg7tNX8g02%]U"^'
+            changeLogFile changeLog
+         }
+    }
 }
 
 apply plugin: 'java'
@@ -32,7 +40,6 @@ compileJava.options.encoding = 'UTF-8'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
-
 
 group = 'com.kingfisher'
 version = '0.0.1-SNAPSHOT'
@@ -43,13 +50,12 @@ repositories {
 }
 
 dependencies {
-    compile files('libs/ojdbc7.jar')
+    compile files('libs/ojdbc8.jar')
     compile 'org.apache.httpcomponents:httpclient:4.5.6'
     
     compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.8.0'
 	compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.8.0'
 	compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.0.0'
-	compile group: 'com.h2database', name: 'h2', version: '1.4.187'
 	
 	implementation('org.springframework.boot:spring-boot-starter-actuator')
 	implementation('org.springframework.boot:spring-boot-starter-data-jpa')

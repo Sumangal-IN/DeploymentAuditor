@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data-sources>
+	<data-source id="oracle_thin-1683fbb5a30-d99a233284aa4fa" provider="oracle" driver="oracle_thin" name="Oracle - ETIIB101" save-password="true" show-system-objects="true" read-only="false">
+		<connection host="unxs0613.ghanp.kfplc.com" port="1527" server="" database="ETIIB101" url="jdbc:oracle:thin:@//unxs0613.ghanp.kfplc.com:1527/ETIIB101" user="INT_INVENTORY" password="NhwBd1VtfE4CQlR7KiMHaEb2" type="dev">
+			<provider-property name="@dbeaver-always-use-dba-views@" value="false"/>
+			<provider-property name="@dbeaver-sid-service@" value="SERVICE"/>
+			<provider-property name="@dbeaver-use-rule-hint@" value="false"/>
+			<provider-property name="@dbeaver-connection-type@" value="BASIC"/>
+			<provider-property name="@dbeaver-check-schema-content@" value="true"/>
+			<provider-property name="@dbeaver-always-show-dba@" value="false"/>
+		</connection>
+	</data-source>
+	<filters/>
+</data-sources>
