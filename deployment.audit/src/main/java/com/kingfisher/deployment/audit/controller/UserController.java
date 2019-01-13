@@ -16,6 +16,9 @@ import com.kingfisher.deployment.audit.user.repository.UserRepository;
 import com.kingfisher.deployment.audit.user.repository.UserRoleRepository;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @RestController
 @Api(value = "User")
@@ -31,6 +34,8 @@ public class UserController {
 	@Autowired
 	CustomPasswordEncoder customPasswordEncoder;
 
+	@ApiOperation("Add a new user or update an existing user")
+	@ApiResponses(value = { @ApiResponse(code = 201, message = "Success"), @ApiResponse(code = 400, message = "Bad Request") })
 	@GetMapping(value = "/createUser", produces = "application/json")
 	public void createUser(@RequestParam("username") String username, @RequestParam("password") String password, @RequestParam("roles") List<String> roles) {
 		// Remove the user and his role if already exists
@@ -44,6 +49,8 @@ public class UserController {
 		}
 	}
 
+	@ApiOperation("Remove an existing user")
+	@ApiResponses(value = { @ApiResponse(code = 201, message = "Success"), @ApiResponse(code = 400, message = "Bad Request") })
 	@GetMapping(value = "/removeUser", produces = "application/json")
 	public void removeUser(@RequestParam("username") String username) {
 		// Remove the user and his role if already exists

@@ -1,17 +1,13 @@
 package com.kingfisher.deployment.audit.controller;
 
 import java.io.IOException;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kingfisher.deployment.audit.data.model.Deployment;
@@ -45,7 +41,7 @@ public class DeploymentAuditController {
 	 */
 	@ApiOperation("Add a set of deployments audits")
 	@ApiResponses(value = { @ApiResponse(code = 201, message = "Success"), @ApiResponse(code = 400, message = "Bad Request") })
-	@PostMapping(value = "/", consumes = "application/json", produces = "application/json")
+	@PostMapping(value = "", consumes = "application/json", produces = "application/json")
 	public ResponseEntity<String> audit(@ApiParam(value = "Deployments that need adding to the audit", required = true) @RequestBody Deployment deployment) {
 		deploymentAuditService.recordDeployments(deployment);
 		return new ResponseEntity<String>(HttpStatus.CREATED);

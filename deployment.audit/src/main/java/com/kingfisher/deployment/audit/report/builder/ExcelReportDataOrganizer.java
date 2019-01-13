@@ -17,10 +17,10 @@ import com.kingfisher.deployment.audit.report.model.ReportCell;
 
 @Component
 public class ExcelReportDataOrganizer {
-	
+
 	@Autowired
 	InstanceRepository instanceRepository;
-	
+
 	enum DataFlag {
 		PLACE_AS_PER_DATA, PLACE_ALL_NA, PLACE_ALL_BLANK
 	}
@@ -145,9 +145,6 @@ public class ExcelReportDataOrganizer {
 
 	private Set<Integer> calculateAmbiguousFields(List<String[]> referenceDeployments, String[] reportingDeployment) {
 		Set<Integer> markAmbiguous = new HashSet<>();
-		if (!reportingDeployment[0].equals("*"))
-			markAmbiguous.add(0);
-
 		boolean partialMatch = false;
 		for (String[] referenceDeployment : referenceDeployments) {
 			if (!reportingDeployment[1].equals(referenceDeployment[1]) && reportingDeployment[2].equals(referenceDeployment[2])) {
@@ -170,7 +167,8 @@ public class ExcelReportDataOrganizer {
 			markAmbiguous.add(1);
 			markAmbiguous.add(2);
 		}
-
+		if (!reportingDeployment[0].equals("*"))
+			markAmbiguous.add(0);
 		return markAmbiguous;
 	}
 

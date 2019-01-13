@@ -37,7 +37,7 @@ public class SecurityConfig {
 	public static class AuditorAccessAdapter extends WebSecurityConfigurerAdapter {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
-			http.csrf().disable().antMatcher("/v1//deployments/report").authorizeRequests().anyRequest()
+			http.csrf().disable().antMatcher("/v1/deployments/report**").authorizeRequests().anyRequest()
 					.hasRole("AUDITOR").and().httpBasic();
 		}
 	}
@@ -47,7 +47,7 @@ public class SecurityConfig {
 	public static class JenkinsAccessAdapter extends WebSecurityConfigurerAdapter {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
-			http.csrf().disable().antMatcher("/v1//deployments").authorizeRequests().anyRequest().hasRole("JENKINS")
+			http.csrf().disable().antMatcher("/v1/deployments**").authorizeRequests().anyRequest().hasRole("JENKINS")
 					.and().httpBasic();
 		}
 	}
