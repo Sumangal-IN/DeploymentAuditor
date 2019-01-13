@@ -71,14 +71,5 @@ public class DeploymentAuditController {
 		return ResponseEntity.status(HttpStatus.CREATED).header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + deploymentAuditService.getReportFileName()).contentLength(data.length) //
 				.body(data);
 	}
-	
-	@ApiOperation("Generates an Excel Report with application status across environments")
-	@ApiResponses(value = { @ApiResponse(code = 201, message = "Success", response = Byte[].class), @ApiResponse(code = 400, message = "Invalid request parameterts", response = AuditError.class) })
-	@GetMapping(value = "/report", produces = "application/vnd.ms-excel")
-	public ResponseEntity<byte[]> getreport(@ApiParam(value = "List of environments to extract info for and compared against reference environment", required = true) @RequestParam("r1") String r1,@RequestParam("r2") List<String> r2) throws IOException {
-		byte[] data = deploymentAuditService.createReport(r1, r2);
-		return ResponseEntity.status(HttpStatus.CREATED).header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + deploymentAuditService.getReportFileName()).contentLength(data.length) //
-				.body(data);
-	}
 
 }

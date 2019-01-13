@@ -17,10 +17,10 @@ import com.kingfisher.deployment.audit.report.model.ReportCell;
 
 @Component
 public class ExcelReportDataOrganizer {
-
+	
 	@Autowired
 	InstanceRepository instanceRepository;
-
+	
 	enum DataFlag {
 		PLACE_AS_PER_DATA, PLACE_ALL_NA, PLACE_ALL_BLANK
 	}

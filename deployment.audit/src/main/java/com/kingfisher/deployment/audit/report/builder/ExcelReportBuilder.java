@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import com.kingfisher.deployment.audit.constant.ApplicationConstant;
 import com.kingfisher.deployment.audit.data.model.Deployment;
+import com.kingfisher.deployment.audit.data.repository.InstanceRepository;
 import com.kingfisher.deployment.audit.report.model.ReportCell;
 
 @Component
@@ -26,6 +27,9 @@ public class ExcelReportBuilder {
 
 	@Autowired
 	ExcelReportDataOrganizer excelReportDataOrganizer;
+
+	@Autowired
+	InstanceRepository instanceRepository;
 
 	/**
 	 * Creates xlsx report from the given deployment information across several
@@ -81,7 +85,7 @@ public class ExcelReportBuilder {
 		// skipping first 3 cells
 		int cellnum = 3;
 		Cell cell = row.createCell(cellnum);
-		ExcelReportStyleBuilder.setValueWithFormatting(cell, referenceEnv, ExcelReportStyleBuilder.headerStyle);
+		ExcelReportStyleBuilder.setValueWithFormatting(cell, referenceEnv + " (" + instanceRepository.findByTier(referenceEnv).size() + ")", ExcelReportStyleBuilder.headerStyle);
 		sheet.addMergedRegion(new CellRangeAddress(rownum, rownum, cellnum, cellnum + 2));
 		cellnum += 3;
 		Set<String> orderedReportingEnv = new HashSet<>();
@@ -89,7 +93,7 @@ public class ExcelReportBuilder {
 			orderedReportingEnv.add(env);
 		for (String env : orderedReportingEnv) {
 			cell = row.createCell(cellnum);
-			ExcelReportStyleBuilder.setValueWithFormatting(cell, env, ExcelReportStyleBuilder.headerStyle);
+			ExcelReportStyleBuilder.setValueWithFormatting(cell, env + " (" + instanceRepository.findByTier(env).size() + ")", ExcelReportStyleBuilder.headerStyle);
 			sheet.addMergedRegion(new CellRangeAddress(rownum, rownum, cellnum, cellnum + 2));
 			cellnum += 3;
 		}
@@ -143,14 +147,10 @@ public class ExcelReportBuilder {
 	private int createBody(int rownum, Sheet sheet, String referenceEnv, Map<String, Map<String, List<Deployment>>> reportData) {
 		for (Entry<String, Map<String, List<Deployment>>> rowDataPerApplication : reportData.entrySet()) {
 			ExcelReportStyleBuilder.formatRow(sheet.createRow(rownum++), "divider");
-			
 			String applicationName = rowDataPerApplication.getKey();
 			Map<String, List<Deployment>> latestDeploymentsAllInstance = rowDataPerApplication.getValue();
-
 			List<ReportCell[]> organizedReportRows = excelReportDataOrganizer.organize(referenceEnv, latestDeploymentsAllInstance);
-
 			rownum = createRowsForApplication(applicationName, rownum, sheet, organizedReportRows);
-			ExcelReportStyleBuilder.formatRow(sheet.createRow(rownum++), "divider");
 		}
 		return rownum;
 	}
