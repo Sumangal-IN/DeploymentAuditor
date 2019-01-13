@@ -57,6 +57,8 @@ public class ExcelReportBuilder {
 		// auto-resize width of all cells according to its content
 		for (int col = 0; col < 7 + (3 * reportingEnv.size()); col++)
 			sheet.autoSizeColumn(col);
+		// turn off default grid lines
+		sheet.setDisplayGridlines(false);
 		// returns the workbook as byte array
 		return workbookToByte(workbook);
 	}
@@ -140,23 +142,26 @@ public class ExcelReportBuilder {
 	 */
 	private int createBody(int rownum, Sheet sheet, String referenceEnv, Map<String, Map<String, List<Deployment>>> reportData) {
 		for (Entry<String, Map<String, List<Deployment>>> rowDataPerApplication : reportData.entrySet()) {
+			ExcelReportStyleBuilder.formatRow(sheet.createRow(rownum++), "divider");
+			
 			String applicationName = rowDataPerApplication.getKey();
 			Map<String, List<Deployment>> latestDeploymentsAllInstance = rowDataPerApplication.getValue();
 
 			List<ReportCell[]> organizedReportRows = excelReportDataOrganizer.organize(referenceEnv, latestDeploymentsAllInstance);
 
 			rownum = createRowsForApplication(applicationName, rownum, sheet, organizedReportRows);
+			ExcelReportStyleBuilder.formatRow(sheet.createRow(rownum++), "divider");
 		}
 		return rownum;
 	}
 
 	private int createRowsForApplication(String applicationName, int currentRow, Sheet sheet, List<ReportCell[]> organizedReportRows) {
-		boolean printAppNameStatus = true;
+		boolean printAppName = true;
 		boolean isAnomaly = isApplicationInAnomaly(organizedReportRows);
 		for (ReportCell[] organizedReportRow : organizedReportRows) {
 			Row row = ExcelReportStyleBuilder.formatRow(sheet.createRow(currentRow), "body");
 			int cellnum = 0;
-			if (printAppNameStatus) {
+			if (printAppName) {
 				Cell cell = row.createCell(++cellnum);
 				ExcelReportStyleBuilder.setValueWithFormatting(cell, applicationName, ExcelReportStyleBuilder.bodyStyle);
 				cell = row.createCell(++cellnum);
@@ -164,7 +169,7 @@ public class ExcelReportBuilder {
 					ExcelReportStyleBuilder.setValueWithFormatting(cell, "û", ExcelReportStyleBuilder.bodyStyleSpecialCharacterRed);
 				else
 					ExcelReportStyleBuilder.setValueWithFormatting(cell, "ü", ExcelReportStyleBuilder.bodyStyleSpecialCharacterGreen);
-				printAppNameStatus = false;
+				printAppName = false;
 			} else {
 				Cell cell = row.createCell(++cellnum);
 				ExcelReportStyleBuilder.setValueWithFormatting(cell, "", ExcelReportStyleBuilder.bodyStyle);
@@ -173,6 +178,10 @@ public class ExcelReportBuilder {
 			}
 			createRowForApplication(organizedReportRow, cellnum, row);
 			currentRow++;
+		}
+		if (currentRow - organizedReportRows.size() != currentRow - 1) {
+			sheet.addMergedRegion(new CellRangeAddress(currentRow - organizedReportRows.size(), currentRow - 1, 1, 1));
+			sheet.addMergedRegion(new CellRangeAddress(currentRow - organizedReportRows.size(), currentRow - 1, 2, 2));
 		}
 		return currentRow;
 	}

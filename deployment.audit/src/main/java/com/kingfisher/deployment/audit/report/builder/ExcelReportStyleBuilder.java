@@ -108,7 +108,7 @@ public class ExcelReportStyleBuilder {
 	public static Row formatRow(Row row, String type) {
 		switch (type) {
 		case "body":
-			row.setHeightInPoints(18f);
+			row.setHeightInPoints(20f);
 			break;
 		case "header":
 			row.setHeightInPoints(24f);
@@ -116,6 +116,8 @@ public class ExcelReportStyleBuilder {
 		case "subHeader":
 			row.setHeightInPoints(24f);
 			break;
+		case "divider":
+			row.setHeightInPoints(8f);
 		default:
 		}
 
