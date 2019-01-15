@@ -21,7 +21,7 @@ buildscript {
 
 apply plugin: 'liquibase'
 
-def changeLog = "$projectDir/src/main/resources/db/changelog.xml"
+def changeLog = "./src/main/resources/db/changelog.xml"
 
 liquibase {
     activities {
