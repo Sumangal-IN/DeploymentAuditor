@@ -21,5 +21,4 @@
 		relativeToChangelogFile="true" />
 	<include file="scripts/001.INIT_DEPLOYMENT.sql"
 		relativeToChangelogFile="true" />
-
 </databaseChangeLog>
