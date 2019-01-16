@@ -15,13 +15,14 @@ import io.restassured.http.ContentType;
 @SpringBootTest
 public class ApplicationTests {
 	@Test
-	public void test_NumberOfCircuitsFor2017Season_ShouldBe20() {	        
+	public void testApplicationHealth() {	        
 		 given().
 		    when().
 		        get("http://localhost:9090/actuator/health").
 		    then().
 		        assertThat().
 		        statusCode(200).
+		        body("status", equalTo("UP")).
 		    and().
 		        contentType(ContentType.JSON);
 	}
