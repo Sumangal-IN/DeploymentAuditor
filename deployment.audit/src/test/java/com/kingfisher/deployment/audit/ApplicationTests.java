@@ -7,18 +7,22 @@ import static org.hamcrest.Matchers.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import io.restassured.http.ContentType;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ApplicationTests {
+	@LocalServerPort
+	private int port;
 	@Test
 	public void testApplicationHealth() {	        
 		 given().
+		 port(port).
 		    when().
-		        get("http://localhost:9090/actuator/health").
+		        get("/actuator/health").
 		    then().
 		        assertThat().
 		        statusCode(200).
