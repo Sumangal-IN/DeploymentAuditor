@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 
 import com.kingfisher.deployment.audit.data.model.Deployment;
 import com.kingfisher.deployment.audit.data.repository.InstanceRepository;
+import com.kingfisher.deployment.audit.report.builder.enums.AmbiguousFlag;
+import com.kingfisher.deployment.audit.report.builder.enums.DataFlag;
 import com.kingfisher.deployment.audit.report.model.ReportCell;
 
 @Component
@@ -20,14 +22,6 @@ public class ExcelReportDataOrganizer {
 
 	@Autowired
 	InstanceRepository instanceRepository;
-
-	enum DataFlag {
-		PLACE_AS_PER_DATA, PLACE_ALL_NA, PLACE_ALL_BLANK
-	}
-
-	enum AmbiguousFlag {
-		MARK_AS_PER_DATA, MARK_ALL_AMBIGUOUS, MARK_ALL_UNAMBIGUOUS
-	}
 
 	private static final int FIELD_COUNT = 3;
 
