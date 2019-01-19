@@ -20,9 +20,6 @@ import com.kingfisher.deployment.audit.rest.response.model.IIBDeploymentStatus;
 @Component
 public class IIBRestClient {
 
-	@Autowired
-	RestTemplate restTemplate;
-
 	@Value("${IIBapi.username}")
 	private String username;
 
