@@ -1,6 +1,8 @@
 package com.kingfisher.deployment.audit.controller;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -58,11 +60,12 @@ public class DeploymentAuditController {
 	 *            reference environment
 	 * @return report in excel format
 	 * @throws IOException
+	 * @throws URISyntaxException
 	 */
 	@ApiOperation("Generates an Excel Report with application status across environments")
 	@ApiResponses(value = { @ApiResponse(code = 201, message = "Success", response = Byte[].class), @ApiResponse(code = 400, message = "Invalid request parameterts", response = AuditError.class) })
 	@PostMapping(value = "/report", produces = "application/vnd.ms-excel")
-	public ResponseEntity<byte[]> report(@ApiParam(value = "List of environments to extract info for and compared against reference environment", required = true) @RequestBody ReportParam param) throws IOException {
+	public ResponseEntity<byte[]> report(@ApiParam(value = "List of environments to extract info for and compared against reference environment", required = true) @RequestBody ReportParam param) throws IOException, URISyntaxException {
 		byte[] data = deploymentAuditService.createReport(param.getReferenceEnv(), param.getReportingEnv());
 		return ResponseEntity.status(HttpStatus.CREATED).header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + deploymentAuditService.getReportFileName()).contentLength(data.length) //
 				.body(data);

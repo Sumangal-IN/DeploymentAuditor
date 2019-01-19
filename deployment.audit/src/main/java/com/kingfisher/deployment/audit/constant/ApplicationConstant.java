@@ -1,6 +1,7 @@
 package com.kingfisher.deployment.audit.constant;
 
 public class ApplicationConstant {
+	
 	/**
 	 * Private constructor to prevent object creation of this class. Members of this
 	 * class should be acessed in static-way.
@@ -27,6 +28,6 @@ public class ApplicationConstant {
 	public static final String IIB_API_PLACEHOLDER_EG = "{EG}";
 	public static final String IIB_API_PLACEHOLDER_APP = "{APP}";
 	public static final String IIB_API_PLACEHOLDER_HOST = "{HOST}";
-	public static final String IIB_API_URL_EG_APP = "https://unxs0527.ghanp.kfplc.com:8090/apiv1/executiongroups/{EG}/applications/{APP}/properties";
-
+	public static final String IIB_API_PLACEHOLDER_PORT = "{PORT}";
+	public static final String IIB_API_URL_EG_APP = "https://{HOST}:{PORT}/apiv1/executiongroups/{EG}/applications/{APP}/properties";
 }

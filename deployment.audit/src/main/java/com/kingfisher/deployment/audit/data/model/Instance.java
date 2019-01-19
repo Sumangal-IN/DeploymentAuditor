@@ -11,19 +11,29 @@ public class Instance {
 	@Id
 	@Column(name = "instance_name")
 	private String instanceName;
+
 	@Column(name = "tier")
 	private String tier;
+
 	@Column(name = "host")
 	private String host;
+
+	@Column(name = "api_host")
+	private String apiHost;
+
+	@Column(name = "api_port")
+	private int apiPort;
 
 	public Instance() {
 	}
 
-	public Instance(String tier, String instanceName, String host) {
+	public Instance(String instanceName, String tier, String host, String apiHost, int apiPort) {
 		super();
-		this.tier = tier;
 		this.instanceName = instanceName;
+		this.tier = tier;
 		this.host = host;
+		this.apiHost = apiHost;
+		this.apiPort = apiPort;
 	}
 
 	public String getTier() {
@@ -48,6 +58,22 @@ public class Instance {
 
 	public void setHost(String host) {
 		this.host = host;
+	}
+
+	public String getApiHost() {
+		return apiHost;
+	}
+
+	public void setApiHost(String apiHost) {
+		this.apiHost = apiHost;
+	}
+
+	public int getApiPort() {
+		return apiPort;
+	}
+
+	public void setApiPort(int apiPort) {
+		this.apiPort = apiPort;
 	}
 
 }

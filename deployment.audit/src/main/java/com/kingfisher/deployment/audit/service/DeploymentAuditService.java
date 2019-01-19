@@ -1,6 +1,7 @@
 package com.kingfisher.deployment.audit.service;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,15 +13,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.kingfisher.deployment.audit.data.model.Deployment;
+import com.kingfisher.deployment.audit.data.model.Instance;
 import com.kingfisher.deployment.audit.data.repository.DeploymentRepository;
+import com.kingfisher.deployment.audit.data.repository.InstanceRepository;
 import com.kingfisher.deployment.audit.report.builder.ExcelReportBuilder;
 import com.kingfisher.deployment.audit.rest.client.IIBRestClient;
+import com.kingfisher.deployment.audit.rest.response.model.IIBDeploymentStatus;
 
 @Service
 public class DeploymentAuditService {
 
 	@Autowired
 	DeploymentRepository deploymentRepository;
+
+	@Autowired
+	InstanceRepository instanceRepository;
 
 	@Autowired
 	ExcelReportBuilder excelReportBuilder;
@@ -38,8 +45,9 @@ public class DeploymentAuditService {
 	 *            a list of environment to be compared with {@code referenceEnv}
 	 * @return
 	 * @throws IOException
+	 * @throws URISyntaxException
 	 */
-	public byte[] createReport(String referenceEnv, List<String> reportingEnvs) throws IOException {
+	public byte[] createReport(String referenceEnv, List<String> reportingEnvs) throws IOException, URISyntaxException {
 		List<String> applications = deploymentRepository.findApplicationNameByEnvironment(referenceEnv);
 
 		Map<String, Map<String, List<Deployment>>> reportData = new TreeMap<>();
@@ -55,13 +63,22 @@ public class DeploymentAuditService {
 	 * @param referenceEnv
 	 * @param reportingEnvs
 	 * @return
+	 * @throws URISyntaxException
 	 */
-	private Map<String, List<Deployment>> prepareDataForApplication(String application, String referenceEnv, List<String> reportingEnvs) {
+	private Map<String, List<Deployment>> prepareDataForApplication(String application, String referenceEnv, List<String> reportingEnvs) throws URISyntaxException {
 		Map<String, List<Deployment>> latestDeploymentsInEnvironmentForApplication = new HashMap<>();
-		latestDeploymentsInEnvironmentForApplication.put(referenceEnv, deploymentRepository.findLatestDeploymentByApplicationNameAndEnvironment(referenceEnv, application));
+		latestDeploymentsInEnvironmentForApplication.put(referenceEnv, updateDeploymentsWithIIBapi(deploymentRepository.findLatestDeploymentByApplicationNameAndEnvironment(referenceEnv, application)));
 		for (String reportingEnv : reportingEnvs)
-			latestDeploymentsInEnvironmentForApplication.put(reportingEnv, deploymentRepository.findLatestDeploymentByApplicationNameAndEnvironment(reportingEnv, application));
+			latestDeploymentsInEnvironmentForApplication.put(reportingEnv, updateDeploymentsWithIIBapi(deploymentRepository.findLatestDeploymentByApplicationNameAndEnvironment(reportingEnv, application)));
 		return latestDeploymentsInEnvironmentForApplication;
+	}
+
+	private List<Deployment> updateDeploymentsWithIIBapi(List<Deployment> deployments) throws URISyntaxException {
+		for (Deployment deployment : deployments) {
+			Instance instance = instanceRepository.findByInstanceName(deployment.getInstanceName());
+			IIBDeploymentStatus iibDeploymentStatus = iibRestClient.getDeployemntProperties(deployment.getIntegrationServer(), deployment.getApplicationName(), instance.getApiHost(), instance.getApiPort());
+		}
+		return deployments;
 	}
 
 	/**

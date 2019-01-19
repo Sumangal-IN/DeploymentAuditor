@@ -10,4 +10,5 @@ import com.kingfisher.deployment.audit.data.model.Instance;
 @Repository
 public interface InstanceRepository extends JpaRepository<Instance, String> {
 	List<Instance> findByTier(String tier);
+	Instance findByInstanceName(String instanceName);
 }
